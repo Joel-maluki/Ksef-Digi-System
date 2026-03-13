@@ -1,30 +1,10 @@
 import { connectDb } from '../config/db';
 import { CategoryModel } from '../models/Category';
-
-const categories = [
-  ['Computer Science', 'CSC'],
-  ['Mathematics', 'MTH'],
-  ['Agriculture', 'AGR'],
-  ['Physics', 'PHY'],
-  ['Food Technology', 'FDT'],
-  ['Economics', 'ECO'],
-  ['Behavioral Science', 'BHS'],
-  ['Robotics', 'ROB'],
-  ['Environmental Science', 'ENV'],
-  ['Engineering', 'ENG'],
-  ['Chemistry', 'CHE'],
-  ['Biology', 'BIO'],
-  ['Renewable Energy', 'RNE'],
-  ['Health Science', 'HSC'],
-  ['Earth & Space Science', 'ESS'],
-  ['Statistics & Data Science', 'SDS'],
-  ['Biotechnology', 'BTE'],
-  ['Applied Technology', 'APT'],
-];
+import { defaultCategories } from '../data/defaultCategories';
 
 const run = async () => {
   await connectDb();
-  for (const [name, code] of categories) {
+  for (const [name, code] of defaultCategories) {
     await CategoryModel.updateOne({ code }, { $set: { name, code, active: true } }, { upsert: true });
   }
   console.log('Categories seeded');
