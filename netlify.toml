@@ -4,3 +4,4 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NEXT_PUBLIC_API_URL = "https://ksef-digi-backend.onrender.com"
