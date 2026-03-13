@@ -1,0 +1,1233 @@
+{
+  "generatedAt": "2026-03-10T16:32:23.153Z",
+  "sources": [
+    {
+      "name": "State Department for Devolution counties index",
+      "url": "https://knowledgehub.devolution.go.ke/kh/Category/counties/"
+    },
+    {
+      "name": "2019 Kenya Population and Housing Census Volume I (county and sub-county reference)",
+      "url": "https://www.knbs.or.ke/2019-kenya-population-and-housing-census-volume-i-population-by-county-and-sub-county/"
+    }
+  ],
+  "regions": [
+    {
+      "name": "Coast",
+      "counties": [
+        {
+          "name": "Kilifi",
+          "subCounties": [
+            "Chonyi",
+            "Ganze",
+            "Kaloleni",
+            "Kauma",
+            "Kilifi North",
+            "Kilifi South",
+            "Magarini",
+            "Malindi",
+            "Rabai"
+          ]
+        },
+        {
+          "name": "Kwale",
+          "subCounties": [
+            "Kinango",
+            "Lunga Lunga",
+            "Matuga",
+            "Msambweni"
+          ]
+        },
+        {
+          "name": "Lamu",
+          "subCounties": [
+            "Lamu East",
+            "Lamu West"
+          ]
+        },
+        {
+          "name": "Mombasa",
+          "subCounties": [
+            "Changamwe",
+            "Jomvu",
+            "Kisauni",
+            "Likoni",
+            "Mvita",
+            "Nyali"
+          ]
+        },
+        {
+          "name": "Taita/Taveta",
+          "subCounties": [
+            "Mwatate",
+            "Taveta",
+            "Voi",
+            "Wundanyi"
+          ]
+        },
+        {
+          "name": "Tana River",
+          "subCounties": [
+            "Bura",
+            "Galole",
+            "Garsen"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "North Eastern",
+      "counties": [
+        {
+          "name": "Garissa",
+          "subCounties": [
+            "Balambala",
+            "Dadaab",
+            "Fafi",
+            "Garissa Township",
+            "Ijara",
+            "Lagdera"
+          ]
+        },
+        {
+          "name": "Mandera",
+          "subCounties": [
+            "Arabia",
+            "Banisa",
+            "Kiliwehiri",
+            "Kutullo",
+            "Lafey",
+            "Mandera Central",
+            "Mandera East",
+            "Mandera North",
+            "Mandera West"
+          ]
+        },
+        {
+          "name": "Wajir",
+          "subCounties": [
+            "Eldas",
+            "Tarbaj",
+            "Wajir East",
+            "Wajir North",
+            "Wajir South",
+            "Wajir West"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Eastern",
+      "counties": [
+        {
+          "name": "Embu",
+          "subCounties": [
+            "Embu East",
+            "Embu North",
+            "Embu West",
+            "Mbeere North",
+            "Mbeere South"
+          ]
+        },
+        {
+          "name": "Isiolo",
+          "subCounties": [
+            "Galbatulla",
+            "Isiolo",
+            "Merti"
+          ]
+        },
+        {
+          "name": "Kitui",
+          "subCounties": [
+            "Kitui Central",
+            "Kitui East",
+            "Kitui Rural",
+            "Kitui South",
+            "Kitui West",
+            "Mwingi Central",
+            "Mwingi North",
+            "Mwingi West"
+          ]
+        },
+        {
+          "name": "Machakos",
+          "subCounties": [
+            "Kangundo",
+            "Kathiani",
+            "Machakos Town",
+            "Masinga",
+            "Matungulu",
+            "Mavoko",
+            "Yatta"
+          ]
+        },
+        {
+          "name": "Makueni",
+          "subCounties": [
+            "Kaiti",
+            "Kathonzweni",
+            "Kibwezi East",
+            "Kibwezi West",
+            "Kilome",
+            "Makueni",
+            "Mbooni East",
+            "Mbooni West",
+            "Nzaui"
+          ]
+        },
+        {
+          "name": "Marsabit",
+          "subCounties": [
+            "Laisamis",
+            "Moyale",
+            "North Horr",
+            "Saku"
+          ]
+        },
+        {
+          "name": "Meru",
+          "subCounties": [
+            "Buuri East",
+            "Buuri West",
+            "Igembe Central",
+            "Igembe North",
+            "Igembe South",
+            "Imenti Central",
+            "Imenti North",
+            "Imenti South",
+            "Tigania East",
+            "Tigania West"
+          ]
+        },
+        {
+          "name": "Tharaka-Nithi",
+          "subCounties": [
+            "Meru South",
+            "Tharaka North",
+            "Tharaka South"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Central",
+      "counties": [
+        {
+          "name": "Kiambu",
+          "subCounties": [
+            "Gatundu North",
+            "Gatundu South",
+            "Githunguri",
+            "Juja",
+            "Kabete",
+            "Kiambaa",
+            "Kiambu",
+            "Kikuyu",
+            "Lari",
+            "Limuru",
+            "Ruiru",
+            "Thika Town"
+          ]
+        },
+        {
+          "name": "Kirinyaga",
+          "subCounties": [
+            "Kirinyaga Central",
+            "Kirinyaga East",
+            "Kirinyaga West",
+            "Mwea East",
+            "Mwea West"
+          ]
+        },
+        {
+          "name": "Murang'a",
+          "subCounties": [
+            "Gatanga",
+            "Kandara",
+            "Kangema",
+            "Kigumo",
+            "Kiharu",
+            "Maragwa",
+            "Mathioya"
+          ]
+        },
+        {
+          "name": "Nyandarua",
+          "subCounties": [
+            "Kinangop",
+            "Kipipiri",
+            "Ndaragwa",
+            "ol Joro Orok",
+            "Ol Kalou"
+          ]
+        },
+        {
+          "name": "Nyeri",
+          "subCounties": [
+            "Kieni East",
+            "Kieni West",
+            "Mathira East",
+            "Mathira West",
+            "Mukurweni",
+            "Nyeri Town",
+            "Othaya",
+            "Tetu"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rift Valley",
+      "counties": [
+        {
+          "name": "Baringo",
+          "subCounties": [
+            "Baringo Central",
+            "Baringo North",
+            "Baringo South",
+            "Eldama Ravine",
+            "Mogotio",
+            "Tiaty"
+          ]
+        },
+        {
+          "name": "Bomet",
+          "subCounties": [
+            "Bomet Central",
+            "Bomet East",
+            "Chepalungu",
+            "Konoin",
+            "Sotik"
+          ]
+        },
+        {
+          "name": "Elgeyo/Marakwet",
+          "subCounties": [
+            "Keiyo North",
+            "Keiyo South",
+            "Marakwet East",
+            "Marakwet West"
+          ]
+        },
+        {
+          "name": "Kajiado",
+          "subCounties": [
+            "Kajiado Central",
+            "Kajiado East",
+            "Kajiado North",
+            "Kajiado South",
+            "Kajiado West"
+          ]
+        },
+        {
+          "name": "Kericho",
+          "subCounties": [
+            "Ainamoi",
+            "BBureti",
+            "Belgut",
+            "Kipkelion East",
+            "Kipkelion West",
+            "Soin/ Sigowet"
+          ]
+        },
+        {
+          "name": "Laikipia",
+          "subCounties": [
+            "Laikipia Central",
+            "Laikipia East",
+            "Laikipia North",
+            "Laikipia West",
+            "Nyahururu"
+          ]
+        },
+        {
+          "name": "Nakuru",
+          "subCounties": [
+            "Bahati",
+            "Gilgil",
+            "Kuresoi North",
+            "Kuresoi South",
+            "Molo",
+            "Naivasha",
+            "Nakuru Town East",
+            "Nakuru Town West",
+            "Njoro",
+            "Rongai",
+            "Subukia"
+          ]
+        },
+        {
+          "name": "Nandi",
+          "subCounties": [
+            "Aldai",
+            "Chesumei",
+            "Emgwen",
+            "Mosop",
+            "Nandi Hills"
+          ]
+        },
+        {
+          "name": "Narok",
+          "subCounties": [
+            "Narok East",
+            "Narok North",
+            "Narok South",
+            "Narok West",
+            "Transmara East",
+            "Transmara West"
+          ]
+        },
+        {
+          "name": "Samburu",
+          "subCounties": [
+            "Samburu East",
+            "Samburu North",
+            "Samburu West"
+          ]
+        },
+        {
+          "name": "Trans Nzoia",
+          "subCounties": [
+            "Cherangany",
+            "Endebess",
+            "Kiminini",
+            "Kwanza",
+            "Saboti"
+          ]
+        },
+        {
+          "name": "Turkana",
+          "subCounties": [
+            "Loima",
+            "Turkana Central",
+            "Turkana East",
+            "Turkana North",
+            "Turkana South",
+            "Turkana West"
+          ]
+        },
+        {
+          "name": "Uasin Gishu",
+          "subCounties": [
+            "Ainabkoi",
+            "Kapseret",
+            "Kesses",
+            "Moiben",
+            "Soy",
+            "Turbo"
+          ]
+        },
+        {
+          "name": "West Pokot",
+          "subCounties": [
+            "Central Pokot",
+            "North Pokot",
+            "Pokot South",
+            "West Pokot"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Western",
+      "counties": [
+        {
+          "name": "Bungoma",
+          "subCounties": [
+            "Bumula",
+            "Elgon",
+            "Kabuchai",
+            "Kanduyi",
+            "Kimilili",
+            "Sirisia",
+            "Tongaren",
+            "Webuye East",
+            "Webuye West"
+          ]
+        },
+        {
+          "name": "Busia",
+          "subCounties": [
+            "Budalangi",
+            "Butula",
+            "Funyula",
+            "Matayos",
+            "Nambale",
+            "Teso North",
+            "Teso South"
+          ]
+        },
+        {
+          "name": "Kakamega",
+          "subCounties": [
+            "Butere",
+            "Ikolomani",
+            "Khwisero",
+            "Likuyani",
+            "Lugari",
+            "Lurambi",
+            "Malava",
+            "Matungu",
+            "Mumias East",
+            "Mumias West",
+            "Navakholo",
+            "Shinyalu"
+          ]
+        },
+        {
+          "name": "Vihiga",
+          "subCounties": [
+            "Emuhaya",
+            "Hamisi",
+            "Luanda",
+            "Sabatia",
+            "Vihiga"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nyanza",
+      "counties": [
+        {
+          "name": "Homa Bay",
+          "subCounties": [
+            "Homa Bay Town",
+            "Kabondo",
+            "Karachuonyo",
+            "Kasipul",
+            "Mbita",
+            "Ndhiwa",
+            "Rangwe",
+            "Suba"
+          ]
+        },
+        {
+          "name": "Kisii",
+          "subCounties": [
+            "Bobasi",
+            "Bomachoge Borabu",
+            "Bomachoge Chache",
+            "Bonchari",
+            "Kitutu Chache North",
+            "Kitutu Chache South",
+            "Nyaribari Chache",
+            "Nyaribari Masaba",
+            "South Mugirango"
+          ]
+        },
+        {
+          "name": "Kisumu",
+          "subCounties": [
+            "Kisumu Central",
+            "Kisumu East",
+            "Kisumu West",
+            "Muhoroni",
+            "Nyakach",
+            "Nyando",
+            "Seme"
+          ]
+        },
+        {
+          "name": "Migori",
+          "subCounties": [
+            "Awendo",
+            "Kuria East",
+            "Kuria West",
+            "Mabera",
+            "Ntimaru",
+            "Nyatike",
+            "Rongo",
+            "Suna east",
+            "Suna West",
+            "Uriri"
+          ]
+        },
+        {
+          "name": "Nyamira",
+          "subCounties": [
+            "Borabu",
+            "Manga",
+            "Masaba North",
+            "Nyamira North",
+            "Nyamira South"
+          ]
+        },
+        {
+          "name": "Siaya",
+          "subCounties": [
+            "Alego Usonga",
+            "Bondo",
+            "Gem",
+            "Rarieda",
+            "Ugenya"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nairobi",
+      "counties": [
+        {
+          "name": "Nairobi City",
+          "subCounties": [
+            "Dagoretti North",
+            "Dagoretti South",
+            "Embakasi Central",
+            "Embakasi East",
+            "Embakasi North",
+            "Embakasi South",
+            "Embakasi West",
+            "Kamukunji",
+            "Kasarani",
+            "Kibra",
+            "Langata",
+            "Makadara",
+            "Mathare",
+            "Roysambu",
+            "Ruaraka",
+            "Starehe",
+            "Westlands"
+          ]
+        }
+      ]
+    }
+  ],
+  "counties": [
+    {
+      "name": "Kilifi",
+      "region": "Coast",
+      "subCounties": [
+        "Chonyi",
+        "Ganze",
+        "Kaloleni",
+        "Kauma",
+        "Kilifi North",
+        "Kilifi South",
+        "Magarini",
+        "Malindi",
+        "Rabai"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kilifi-county/"
+    },
+    {
+      "name": "Kwale",
+      "region": "Coast",
+      "subCounties": [
+        "Kinango",
+        "Lunga Lunga",
+        "Matuga",
+        "Msambweni"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kwale-county/"
+    },
+    {
+      "name": "Lamu",
+      "region": "Coast",
+      "subCounties": [
+        "Lamu East",
+        "Lamu West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/lamu-county/"
+    },
+    {
+      "name": "Mombasa",
+      "region": "Coast",
+      "subCounties": [
+        "Changamwe",
+        "Jomvu",
+        "Kisauni",
+        "Likoni",
+        "Mvita",
+        "Nyali"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/mombasa-county/"
+    },
+    {
+      "name": "Taita/Taveta",
+      "region": "Coast",
+      "subCounties": [
+        "Mwatate",
+        "Taveta",
+        "Voi",
+        "Wundanyi"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/taita-taveta-county/"
+    },
+    {
+      "name": "Tana River",
+      "region": "Coast",
+      "subCounties": [
+        "Bura",
+        "Galole",
+        "Garsen"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/tana-river-county/"
+    },
+    {
+      "name": "Garissa",
+      "region": "North Eastern",
+      "subCounties": [
+        "Balambala",
+        "Dadaab",
+        "Fafi",
+        "Garissa Township",
+        "Ijara",
+        "Lagdera"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/garissa-county/"
+    },
+    {
+      "name": "Mandera",
+      "region": "North Eastern",
+      "subCounties": [
+        "Arabia",
+        "Banisa",
+        "Kiliwehiri",
+        "Kutullo",
+        "Lafey",
+        "Mandera Central",
+        "Mandera East",
+        "Mandera North",
+        "Mandera West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/mandera-county/"
+    },
+    {
+      "name": "Wajir",
+      "region": "North Eastern",
+      "subCounties": [
+        "Eldas",
+        "Tarbaj",
+        "Wajir East",
+        "Wajir North",
+        "Wajir South",
+        "Wajir West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/wajir-county/"
+    },
+    {
+      "name": "Embu",
+      "region": "Eastern",
+      "subCounties": [
+        "Embu East",
+        "Embu North",
+        "Embu West",
+        "Mbeere North",
+        "Mbeere South"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/embu-county/"
+    },
+    {
+      "name": "Isiolo",
+      "region": "Eastern",
+      "subCounties": [
+        "Galbatulla",
+        "Isiolo",
+        "Merti"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/isiolo-county/"
+    },
+    {
+      "name": "Kitui",
+      "region": "Eastern",
+      "subCounties": [
+        "Kitui Central",
+        "Kitui East",
+        "Kitui Rural",
+        "Kitui South",
+        "Kitui West",
+        "Mwingi Central",
+        "Mwingi North",
+        "Mwingi West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kitui-county/"
+    },
+    {
+      "name": "Machakos",
+      "region": "Eastern",
+      "subCounties": [
+        "Kangundo",
+        "Kathiani",
+        "Machakos Town",
+        "Masinga",
+        "Matungulu",
+        "Mavoko",
+        "Yatta"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/machakos-county/"
+    },
+    {
+      "name": "Makueni",
+      "region": "Eastern",
+      "subCounties": [
+        "Kaiti",
+        "Kathonzweni",
+        "Kibwezi East",
+        "Kibwezi West",
+        "Kilome",
+        "Makueni",
+        "Mbooni East",
+        "Mbooni West",
+        "Nzaui"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/makueni-county/"
+    },
+    {
+      "name": "Marsabit",
+      "region": "Eastern",
+      "subCounties": [
+        "Laisamis",
+        "Moyale",
+        "North Horr",
+        "Saku"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/marsabit-county/"
+    },
+    {
+      "name": "Meru",
+      "region": "Eastern",
+      "subCounties": [
+        "Buuri East",
+        "Buuri West",
+        "Igembe Central",
+        "Igembe North",
+        "Igembe South",
+        "Imenti Central",
+        "Imenti North",
+        "Imenti South",
+        "Tigania East",
+        "Tigania West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/meru-county/"
+    },
+    {
+      "name": "Tharaka-Nithi",
+      "region": "Eastern",
+      "subCounties": [
+        "Meru South",
+        "Tharaka North",
+        "Tharaka South"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/tharaka-nithi-county/"
+    },
+    {
+      "name": "Kiambu",
+      "region": "Central",
+      "subCounties": [
+        "Gatundu North",
+        "Gatundu South",
+        "Githunguri",
+        "Juja",
+        "Kabete",
+        "Kiambaa",
+        "Kiambu",
+        "Kikuyu",
+        "Lari",
+        "Limuru",
+        "Ruiru",
+        "Thika Town"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kiambu-county/"
+    },
+    {
+      "name": "Kirinyaga",
+      "region": "Central",
+      "subCounties": [
+        "Kirinyaga Central",
+        "Kirinyaga East",
+        "Kirinyaga West",
+        "Mwea East",
+        "Mwea West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kirinyaga-county/"
+    },
+    {
+      "name": "Murang'a",
+      "region": "Central",
+      "subCounties": [
+        "Gatanga",
+        "Kandara",
+        "Kangema",
+        "Kigumo",
+        "Kiharu",
+        "Maragwa",
+        "Mathioya"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/muranga-county/"
+    },
+    {
+      "name": "Nyandarua",
+      "region": "Central",
+      "subCounties": [
+        "Kinangop",
+        "Kipipiri",
+        "Ndaragwa",
+        "ol Joro Orok",
+        "Ol Kalou"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/nyandarua-county/"
+    },
+    {
+      "name": "Nyeri",
+      "region": "Central",
+      "subCounties": [
+        "Kieni East",
+        "Kieni West",
+        "Mathira East",
+        "Mathira West",
+        "Mukurweni",
+        "Nyeri Town",
+        "Othaya",
+        "Tetu"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/nyeri-county/"
+    },
+    {
+      "name": "Baringo",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Baringo Central",
+        "Baringo North",
+        "Baringo South",
+        "Eldama Ravine",
+        "Mogotio",
+        "Tiaty"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/baringo-county/"
+    },
+    {
+      "name": "Bomet",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Bomet Central",
+        "Bomet East",
+        "Chepalungu",
+        "Konoin",
+        "Sotik"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/bomet-county/"
+    },
+    {
+      "name": "Elgeyo/Marakwet",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Keiyo North",
+        "Keiyo South",
+        "Marakwet East",
+        "Marakwet West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/elgeyo-marakwet-county/"
+    },
+    {
+      "name": "Kajiado",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Kajiado Central",
+        "Kajiado East",
+        "Kajiado North",
+        "Kajiado South",
+        "Kajiado West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kajiado-county/"
+    },
+    {
+      "name": "Kericho",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Ainamoi",
+        "BBureti",
+        "Belgut",
+        "Kipkelion East",
+        "Kipkelion West",
+        "Soin/ Sigowet"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kericho-county/"
+    },
+    {
+      "name": "Laikipia",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Laikipia Central",
+        "Laikipia East",
+        "Laikipia North",
+        "Laikipia West",
+        "Nyahururu"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/laikipia-county/"
+    },
+    {
+      "name": "Nakuru",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Bahati",
+        "Gilgil",
+        "Kuresoi North",
+        "Kuresoi South",
+        "Molo",
+        "Naivasha",
+        "Nakuru Town East",
+        "Nakuru Town West",
+        "Njoro",
+        "Rongai",
+        "Subukia"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/nakuru-county/"
+    },
+    {
+      "name": "Nandi",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Aldai",
+        "Chesumei",
+        "Emgwen",
+        "Mosop",
+        "Nandi Hills"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/nandi-county/"
+    },
+    {
+      "name": "Narok",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Narok East",
+        "Narok North",
+        "Narok South",
+        "Narok West",
+        "Transmara East",
+        "Transmara West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/narok-county/"
+    },
+    {
+      "name": "Samburu",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Samburu East",
+        "Samburu North",
+        "Samburu West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/samburu-county/"
+    },
+    {
+      "name": "Trans Nzoia",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Cherangany",
+        "Endebess",
+        "Kiminini",
+        "Kwanza",
+        "Saboti"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/transzoia-county/"
+    },
+    {
+      "name": "Turkana",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Loima",
+        "Turkana Central",
+        "Turkana East",
+        "Turkana North",
+        "Turkana South",
+        "Turkana West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/turkana-county/"
+    },
+    {
+      "name": "Uasin Gishu",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Ainabkoi",
+        "Kapseret",
+        "Kesses",
+        "Moiben",
+        "Soy",
+        "Turbo"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/uasin-gishu-county/"
+    },
+    {
+      "name": "West Pokot",
+      "region": "Rift Valley",
+      "subCounties": [
+        "Central Pokot",
+        "North Pokot",
+        "Pokot South",
+        "West Pokot"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/west-pokot-county/"
+    },
+    {
+      "name": "Bungoma",
+      "region": "Western",
+      "subCounties": [
+        "Bumula",
+        "Elgon",
+        "Kabuchai",
+        "Kanduyi",
+        "Kimilili",
+        "Sirisia",
+        "Tongaren",
+        "Webuye East",
+        "Webuye West"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/bungoma-county/"
+    },
+    {
+      "name": "Busia",
+      "region": "Western",
+      "subCounties": [
+        "Budalangi",
+        "Butula",
+        "Funyula",
+        "Matayos",
+        "Nambale",
+        "Teso North",
+        "Teso South"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/busia-county/"
+    },
+    {
+      "name": "Kakamega",
+      "region": "Western",
+      "subCounties": [
+        "Butere",
+        "Ikolomani",
+        "Khwisero",
+        "Likuyani",
+        "Lugari",
+        "Lurambi",
+        "Malava",
+        "Matungu",
+        "Mumias East",
+        "Mumias West",
+        "Navakholo",
+        "Shinyalu"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kakamega-county/"
+    },
+    {
+      "name": "Vihiga",
+      "region": "Western",
+      "subCounties": [
+        "Emuhaya",
+        "Hamisi",
+        "Luanda",
+        "Sabatia",
+        "Vihiga"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/vihiga-county/"
+    },
+    {
+      "name": "Homa Bay",
+      "region": "Nyanza",
+      "subCounties": [
+        "Homa Bay Town",
+        "Kabondo",
+        "Karachuonyo",
+        "Kasipul",
+        "Mbita",
+        "Ndhiwa",
+        "Rangwe",
+        "Suba"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/homabay-county/"
+    },
+    {
+      "name": "Kisii",
+      "region": "Nyanza",
+      "subCounties": [
+        "Bobasi",
+        "Bomachoge Borabu",
+        "Bomachoge Chache",
+        "Bonchari",
+        "Kitutu Chache North",
+        "Kitutu Chache South",
+        "Nyaribari Chache",
+        "Nyaribari Masaba",
+        "South Mugirango"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kisii-county/"
+    },
+    {
+      "name": "Kisumu",
+      "region": "Nyanza",
+      "subCounties": [
+        "Kisumu Central",
+        "Kisumu East",
+        "Kisumu West",
+        "Muhoroni",
+        "Nyakach",
+        "Nyando",
+        "Seme"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/kisumu-county/"
+    },
+    {
+      "name": "Migori",
+      "region": "Nyanza",
+      "subCounties": [
+        "Awendo",
+        "Kuria East",
+        "Kuria West",
+        "Mabera",
+        "Ntimaru",
+        "Nyatike",
+        "Rongo",
+        "Suna east",
+        "Suna West",
+        "Uriri"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/migori-county/"
+    },
+    {
+      "name": "Nyamira",
+      "region": "Nyanza",
+      "subCounties": [
+        "Borabu",
+        "Manga",
+        "Masaba North",
+        "Nyamira North",
+        "Nyamira South"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/nyamira-county/"
+    },
+    {
+      "name": "Siaya",
+      "region": "Nyanza",
+      "subCounties": [
+        "Alego Usonga",
+        "Bondo",
+        "Gem",
+        "Rarieda",
+        "Ugenya"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/siaya-county/"
+    },
+    {
+      "name": "Nairobi City",
+      "region": "Nairobi",
+      "subCounties": [
+        "Dagoretti North",
+        "Dagoretti South",
+        "Embakasi Central",
+        "Embakasi East",
+        "Embakasi North",
+        "Embakasi South",
+        "Embakasi West",
+        "Kamukunji",
+        "Kasarani",
+        "Kibra",
+        "Langata",
+        "Makadara",
+        "Mathare",
+        "Roysambu",
+        "Ruaraka",
+        "Starehe",
+        "Westlands"
+      ],
+      "sourceUrl": "https://knowledgehub.devolution.go.ke/kh/Category/counties/nairobi-county/"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "ksef-system-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend API for KSEF System",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "node scripts/dev-watch.cjs",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "generate:locations": "node scripts/generate-kenya-administrative-units.js",
+    "seed:categories": "tsx src/seed/seedCategories.ts",
+    "seed:demo-users": "tsx src/seed/seedDemoUsers.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.29",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

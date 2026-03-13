@@ -1,0 +1,39 @@
+# Workspace tooling
+.codex/
+
+# Dependencies
+Backend/node_modules/
+Frontend/node_modules/
+
+# Build output
+Backend/dist/
+Frontend/.next/
+Frontend/.same/
+Frontend/out/
+Frontend/build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment files
+Backend/.env
+Backend/.env.local
+Backend/.env.*
+Backend/.env.txt
+!Backend/.env.example
+Frontend/.env
+Frontend/.env.local
+Frontend/.env.*
+!Frontend/.env.example
+
+# TypeScript / framework generated files
+Frontend/*.tsbuildinfo
+Frontend/next-env.d.ts
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
