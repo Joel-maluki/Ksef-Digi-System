@@ -30,6 +30,12 @@ export function useRequireAuth(options?: { allowPendingPasswordChange?: boolean 
         const currentUser = await me();
         const requiredRole = getRequiredRole(pathname);
 
+        if (!currentUser) {
+          setUser(null);
+          router.replace('/login');
+          return;
+        }
+
         if (
           currentUser?.mustChangePassword &&
           !options?.allowPendingPasswordChange &&
