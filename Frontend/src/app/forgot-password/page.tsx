@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { KeyRound } from 'lucide-react';
 import { PublicHeader } from '@/components/layout/PublicHeader';
@@ -12,7 +12,7 @@ import { forgotPassword } from '@/lib/api';
 
 const allowedRoles = ['judge', 'patron'] as const;
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordPageContent() {
   const searchParams = useSearchParams();
   const initialRole = searchParams.get('role');
   const [role, setRole] = useState<'judge' | 'patron'>('judge');
@@ -147,5 +147,26 @@ export default function ForgotPasswordPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="page-shell">
+          <PublicHeader />
+          <div className="mx-auto flex max-w-7xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+            <Card className="surface w-full max-w-xl p-2">
+              <CardContent className="p-6 text-sm text-slate-300">
+                Loading password recovery...
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      }
+    >
+      <ForgotPasswordPageContent />
+    </Suspense>
   );
 }
