@@ -21,11 +21,34 @@ import locationRoutes from './routes/location.routes';
 import publicRoutes from './routes/public.routes';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 
+const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, '');
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const originMatchesRule = (origin: string, rule: string) => {
+  const normalizedOrigin = normalizeOrigin(origin);
+  const normalizedRule = normalizeOrigin(rule);
+
+  if (!normalizedRule) {
+    return false;
+  }
+
+  if (normalizedRule === '*') {
+    return true;
+  }
+
+  const pattern = new RegExp(`^${escapeRegex(normalizedRule).replace(/\\\*/g, '.*')}$`, 'i');
+  return pattern.test(normalizedOrigin);
+};
+
 const app = express();
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || env.corsOrigins.includes('*') || env.corsOrigins.includes(origin)) {
+      if (
+        !origin ||
+        env.corsOrigins.some((allowedOrigin) => originMatchesRule(origin, allowedOrigin))
+      ) {
         return callback(null, true);
       }
 

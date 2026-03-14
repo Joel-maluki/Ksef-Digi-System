@@ -2,15 +2,26 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, '');
+
+const defaultCorsOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
 const rawCorsOrigins =
   process.env.CORS_ORIGINS ||
   process.env.CORS_ORIGIN ||
-  'http://localhost:3000';
+  defaultCorsOrigins.join(',');
 
-const corsOrigins = rawCorsOrigins
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const frontendUrl = normalizeOrigin(process.env.FRONTEND_URL || 'http://localhost:3000');
+
+const corsOrigins = Array.from(
+  new Set(
+    rawCorsOrigins
+      .split(',')
+      .map((origin) => normalizeOrigin(origin))
+      .filter(Boolean)
+      .concat(frontendUrl)
+  )
+);
 
 export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -19,7 +30,7 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || 'change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   corsOrigins,
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrl,
   donationPaybillNumber: process.env.DONATION_PAYBILL_NUMBER || '522522',
   donationAccountNumber: process.env.DONATION_ACCOUNT_NUMBER || '1199328480',
   smsGatewayUrl: process.env.SMS_GATEWAY_URL || '',
