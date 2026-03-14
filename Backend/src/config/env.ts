@@ -5,6 +5,7 @@ dotenv.config();
 const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, '');
 
 const defaultCorsOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+const hostedFrontendFallbackOrigins = ['https://ksef-digi-system.vercel.app'];
 
 const rawCorsOrigins =
   process.env.CORS_ORIGINS ||
@@ -19,7 +20,7 @@ const corsOrigins = Array.from(
       .split(',')
       .map((origin) => normalizeOrigin(origin))
       .filter(Boolean)
-      .concat(frontendUrl)
+      .concat(frontendUrl, ...hostedFrontendFallbackOrigins)
   )
 );
 
