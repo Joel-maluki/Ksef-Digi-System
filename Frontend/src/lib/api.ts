@@ -545,6 +545,7 @@ const buildUrl = (path: string) => `${BASE_URL}${path}`;
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
+  const method = String(options.method || 'GET').toUpperCase();
   const headers: Record<string, string> = {
     ...defaultHeaders,
     ...(options.headers as Record<string, string>),
@@ -557,6 +558,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(buildUrl(path), {
     ...options,
     headers,
+    // Avoid cached 304 responses from the API, which can leave client pages
+    // without a usable JSON body for dropdowns and dashboard data.
+    cache: options.cache ?? (method === 'GET' || method === 'HEAD' ? 'no-store' : undefined),
   });
 
   let body: unknown = null;
