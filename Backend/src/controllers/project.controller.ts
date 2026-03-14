@@ -11,6 +11,10 @@ import { ApiError } from '../utils/ApiError';
 import { ok } from '../utils/apiResponse';
 import { calculateCategoryRanking } from '../services/ranking.service';
 import { autoAssignJudgesForProject } from '../services/judgeAssignment.service';
+import {
+  adminCanAccessProject,
+  buildScopedProjectFilter,
+} from '../services/adminScope.service';
 
 type SchoolSnapshot = {
   _id?: unknown;
@@ -102,6 +106,24 @@ const loadSchoolForProject = async (schoolId: unknown) => {
   return school;
 };
 
+const getParamId = (value: string | string[]) =>
+  Array.isArray(value) ? value[0] : value;
+
+const ensureAdminProjectAccess = async (req: Request, projectId: string) => {
+  if (req.user?.role !== 'admin') {
+    return;
+  }
+
+  const allowed = await adminCanAccessProject(projectId, req.adminScope);
+
+  if (!allowed) {
+    throw new ApiError(
+      403,
+      'This project is outside your assigned competition area or level'
+    );
+  }
+};
+
 export const createProject = async (req: Request, res: Response) => {
   const { title, categoryId, abstractPdfUrl, currentLevel, students } = req.body;
 
@@ -138,7 +160,7 @@ export const createProject = async (req: Request, res: Response) => {
 };
 
 export const listProjects = async (req: Request, res: Response) => {
-  const query: any = {};
+  let query: any = {};
   if (req.query.categoryId) query.categoryId = req.query.categoryId;
   if (req.query.currentLevel) query.currentLevel = req.query.currentLevel;
   if (req.query.status) query.submissionStatus = req.query.status;
@@ -167,6 +189,10 @@ export const listProjects = async (req: Request, res: Response) => {
     query.schoolId = { $in: schools.map((school) => school._id) };
   }
 
+  if (req.user?.role === 'admin') {
+    query = await buildScopedProjectFilter(req.adminScope, query);
+  }
+
   const projects = await ProjectModel.find(query)
     .populate('categoryId', 'name code')
     .populate('schoolId', 'name subCounty county region')
@@ -175,17 +201,21 @@ export const listProjects = async (req: Request, res: Response) => {
 };
 
 export const getProject = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findById(req.params.id)
+  const projectId = getParamId(req.params.id);
+  const project = await ProjectModel.findById(projectId)
     .populate('categoryId', 'name code')
     .populate('schoolId', 'name subCounty county region');
   if (!project) throw new ApiError(404, 'Project not found');
+  await ensureAdminProjectAccess(req, projectId);
   res.json(ok(project));
 };
 
 export const updateProject = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findById(req.params.id);
+  const projectId = getParamId(req.params.id);
+  const project = await ProjectModel.findById(projectId);
   if (!project) throw new ApiError(404, 'Project not found');
   if (req.user?.role === 'patron' && String(project.patronId) !== req.user.userId) throw new ApiError(403, 'Forbidden');
+  await ensureAdminProjectAccess(req, projectId);
 
   const updates: Record<string, unknown> = { ...req.body };
   const school = await loadSchoolForProject(project.schoolId);
@@ -217,7 +247,7 @@ export const updateProject = async (req: Request, res: Response) => {
     );
   }
 
-  const updated = await ProjectModel.findByIdAndUpdate(req.params.id, updates, {
+  const updated = await ProjectModel.findByIdAndUpdate(projectId, updates, {
     new: true,
     runValidators: true,
   });
@@ -225,16 +255,20 @@ export const updateProject = async (req: Request, res: Response) => {
 };
 
 export const deleteProject = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findById(req.params.id);
+  const projectId = getParamId(req.params.id);
+  const project = await ProjectModel.findById(projectId);
   if (!project) throw new ApiError(404, 'Project not found');
   if (req.user?.role === 'patron' && String(project.patronId) !== req.user.userId) throw new ApiError(403, 'Forbidden');
+  await ensureAdminProjectAccess(req, projectId);
   await project.deleteOne();
   res.json(ok(null, 'Project deleted'));
 };
 
 export const promoteProject = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findById(req.params.id);
+  const projectId = getParamId(req.params.id);
+  const project = await ProjectModel.findById(projectId);
   if (!project) throw new ApiError(404, 'Project not found');
+  await ensureAdminProjectAccess(req, projectId);
   if (project.currentLevel === 'national') {
     throw new ApiError(400, 'National-level projects cannot be promoted further');
   }
@@ -252,11 +286,13 @@ export const promoteProject = async (req: Request, res: Response) => {
 };
 
 export const reopenProjectScoring = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findById(req.params.id);
+  const projectId = getParamId(req.params.id);
+  const project = await ProjectModel.findById(projectId);
 
   if (!project) {
     throw new ApiError(404, 'Project not found');
   }
+  await ensureAdminProjectAccess(req, projectId);
 
   const [scoreResult, assignmentResult] = await Promise.all([
     ScoreModel.updateMany({ projectId: project._id }, { locked: false }),
@@ -300,18 +336,22 @@ export const reopenProjectScoring = async (req: Request, res: Response) => {
 };
 
 export const getProjectRankingSummary = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findById(req.params.id);
+  const projectId = getParamId(req.params.id);
+  const project = await ProjectModel.findById(projectId);
   if (!project) throw new ApiError(404, 'Project not found');
+  await ensureAdminProjectAccess(req, projectId);
   const rankings = await calculateCategoryRanking(String(project.categoryId), project.currentLevel);
   const summary = rankings.find((item) => item.projectId === String(project._id));
   res.json(ok(summary));
 };
 
-export const listProjectMentorCandidates = async (_req: Request, res: Response) => {
-  const projects = await ProjectModel.find({
+export const listProjectMentorCandidates = async (req: Request, res: Response) => {
+  const projectFilter = await buildScopedProjectFilter(req.adminScope, {
     mentorName: { $exists: true, $ne: '' },
     mentorEmail: { $exists: true, $ne: '' },
-  })
+  });
+
+  const projects = await ProjectModel.find(projectFilter)
     .select('mentorName mentorEmail mentorPhone schoolId projectCode title')
     .populate('schoolId', 'name')
     .lean<

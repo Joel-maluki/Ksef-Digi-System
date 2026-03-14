@@ -10,6 +10,7 @@ import {
   setPassword,
 } from '../controllers/auth.controller';
 import { requireAuth } from '../middlewares/auth';
+import { loadAdminScope, requireGlobalAdmin } from '../middlewares/adminScope';
 import { requireRole } from '../middlewares/roles';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -31,9 +32,30 @@ router.post('/bootstrap-admin', asyncHandler(registerAdmin));
 /**
  * ADMIN ONLY ROUTES
  */
-router.post('/register-admin', requireAuth, requireRole('admin'), asyncHandler(registerAdmin));
-router.post('/register-patron', requireAuth, requireRole('admin'), asyncHandler(registerPatron));
-router.post('/register-judge', requireAuth, requireRole('admin'), asyncHandler(registerJudge));
+router.post(
+  '/register-admin',
+  requireAuth,
+  asyncHandler(loadAdminScope),
+  requireRole('admin'),
+  requireGlobalAdmin,
+  asyncHandler(registerAdmin)
+);
+router.post(
+  '/register-patron',
+  requireAuth,
+  asyncHandler(loadAdminScope),
+  requireRole('admin'),
+  requireGlobalAdmin,
+  asyncHandler(registerPatron)
+);
+router.post(
+  '/register-judge',
+  requireAuth,
+  asyncHandler(loadAdminScope),
+  requireRole('admin'),
+  requireGlobalAdmin,
+  asyncHandler(registerJudge)
+);
 router.post('/set-password', requireAuth, asyncHandler(setPassword));
 
 router.get('/me', requireAuth, asyncHandler(me));

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import { UserModel } from '../models/User';
+import { upsertAdminAssignment } from '../services/adminScope.service';
 import { SchoolModel } from '../models/School';
 import { validateKenyaSchoolLocation } from '../services/kenyaAdministrativeUnits.service';
 import { buildPasswordRecoverySms, sendSms } from '../services/sms.service';
@@ -179,6 +180,15 @@ const createUser = async (req: Request, res: Response) => {
     schoolId,
     trainedJudge: !!trainedJudge,
   });
+
+  if (role === 'admin') {
+    await upsertAdminAssignment(String(user._id), {
+      competitionLevel: req.body?.competitionLevel || 'global',
+      region: req.body?.region,
+      county: req.body?.county,
+      subCounty: req.body?.subCounty,
+    });
+  }
 
   res.status(201).json(ok({ user: formatUser(user) }, 'User created'));
 };

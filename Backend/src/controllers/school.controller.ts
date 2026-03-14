@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { SchoolModel } from '../models/School';
 import { ProjectModel } from '../models/Project';
 import { UserModel } from '../models/User';
+import { buildSchoolScopeFilter } from '../services/adminScope.service';
 import {
   findKenyaCountyByName,
   validateKenyaSchoolLocation,
@@ -16,12 +17,21 @@ import { ok } from '../utils/apiResponse';
 
 const normalizeString = (value: unknown) => normalizeSchoolField(value);
 
-export const listSchools = async (_req: Request, res: Response) => {
-  const schools = await SchoolModel.find().sort({ name: 1 });
+export const listSchools = async (req: Request, res: Response) => {
+  const schoolFilter =
+    req.user?.role === 'admin' ? buildSchoolScopeFilter(req.adminScope) : {};
+  const schools = await SchoolModel.find(schoolFilter).sort({ name: 1 });
   res.json(ok(schools));
 };
 
 export const getSchool = async (req: Request, res: Response) => {
+  if (req.user?.role === 'admin' && req.adminScope && !req.adminScope.isGlobal) {
+    const schoolFilter = buildSchoolScopeFilter(req.adminScope);
+    const school = await SchoolModel.findOne({ _id: req.params.id, ...schoolFilter });
+    if (!school) throw new ApiError(404, 'School not found');
+    return res.json(ok(school));
+  }
+
   const school = await SchoolModel.findById(req.params.id);
   if (!school) throw new ApiError(404, 'School not found');
   res.json(ok(school));
