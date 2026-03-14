@@ -1,10 +1,7 @@
 [build]
+  base = "Frontend"
   command = "npm run build"
-  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
   NEXT_PUBLIC_API_URL = "https://ksef-digi-backend.onrender.com"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
