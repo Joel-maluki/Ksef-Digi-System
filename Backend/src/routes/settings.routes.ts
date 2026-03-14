@@ -12,7 +12,6 @@ router.get(
   requireAuth,
   asyncHandler(loadAdminScope),
   requireRole('admin'),
-  requireGlobalAdmin,
   asyncHandler(getSettings)
 );
 router.patch(

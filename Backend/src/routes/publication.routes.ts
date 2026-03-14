@@ -5,7 +5,7 @@ import {
   publishCategoryResults,
 } from '../controllers/publication.controller';
 import { requireAuth } from '../middlewares/auth';
-import { loadAdminScope, requireGlobalAdmin } from '../middlewares/adminScope';
+import { loadAdminScope } from '../middlewares/adminScope';
 import { requireRole } from '../middlewares/roles';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -15,7 +15,6 @@ router.get(
   requireAuth,
   asyncHandler(loadAdminScope),
   requireRole('admin'),
-  requireGlobalAdmin,
   asyncHandler(publicationOverview)
 );
 router.post(
@@ -23,7 +22,6 @@ router.post(
   requireAuth,
   asyncHandler(loadAdminScope),
   requireRole('admin'),
-  requireGlobalAdmin,
   asyncHandler(publishCategoryResults)
 );
 router.post(
@@ -31,7 +29,6 @@ router.post(
   requireAuth,
   asyncHandler(loadAdminScope),
   requireRole('admin'),
-  requireGlobalAdmin,
   asyncHandler(hideCategoryResults)
 );
 export default router;

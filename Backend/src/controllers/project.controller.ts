@@ -13,6 +13,8 @@ import { calculateCategoryRanking } from '../services/ranking.service';
 import { autoAssignJudgesForProject } from '../services/judgeAssignment.service';
 import {
   adminCanAccessProject,
+  buildCompetitionScopeFromSchoolLocation,
+  buildPublicationScopeFilter,
   buildScopedProjectFilter,
 } from '../services/adminScope.service';
 
@@ -302,10 +304,27 @@ export const reopenProjectScoring = async (req: Request, res: Response) => {
     ),
   ]);
 
+  const school = await SchoolModel.findById(project.schoolId)
+    .select('region county subCounty')
+    .lean();
+  const scope = buildCompetitionScopeFromSchoolLocation(
+    {
+      region: school?.region,
+      county: school?.county,
+      subCounty: school?.subCounty,
+    },
+    project.currentLevel as Parameters<typeof buildCompetitionScopeFromSchoolLocation>[1]
+  );
+  const publicationScopeFilter = buildPublicationScopeFilter(scope);
+  const scopedProjectFilter = await buildScopedProjectFilter(scope, {
+    categoryId: project.categoryId,
+  });
+
   await ResultPublicationModel.findOneAndUpdate(
     {
       categoryId: project.categoryId,
-      competitionLevel: project.currentLevel,
+      competitionLevel: scope.competitionLevel,
+      ...publicationScopeFilter,
     },
     {
       published: false,
@@ -313,7 +332,7 @@ export const reopenProjectScoring = async (req: Request, res: Response) => {
   );
 
   await ProjectModel.updateMany(
-    { categoryId: project.categoryId, currentLevel: project.currentLevel },
+    scopedProjectFilter,
     { published: false }
   );
 
@@ -340,7 +359,19 @@ export const getProjectRankingSummary = async (req: Request, res: Response) => {
   const project = await ProjectModel.findById(projectId);
   if (!project) throw new ApiError(404, 'Project not found');
   await ensureAdminProjectAccess(req, projectId);
-  const rankings = await calculateCategoryRanking(String(project.categoryId), project.currentLevel);
+  const school = await SchoolModel.findById(project.schoolId)
+    .select('region county subCounty')
+    .lean();
+  const rankings = await calculateCategoryRanking(String(project.categoryId), {
+    ...buildCompetitionScopeFromSchoolLocation(
+      {
+        region: school?.region,
+        county: school?.county,
+        subCounty: school?.subCounty,
+      },
+      project.currentLevel as Parameters<typeof buildCompetitionScopeFromSchoolLocation>[1]
+    ),
+  });
   const summary = rankings.find((item) => item.projectId === String(project._id));
   res.json(ok(summary));
 };

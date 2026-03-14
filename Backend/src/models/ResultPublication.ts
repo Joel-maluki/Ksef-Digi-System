@@ -8,6 +8,9 @@ const resultPublicationSchema = new Schema(
       enum: ['sub_county', 'county', 'regional', 'national'],
       required: true,
     },
+    region: { type: String },
+    county: { type: String },
+    subCounty: { type: String },
     published: { type: Boolean, default: false },
     forced: { type: Boolean, default: false },
     publishedAt: { type: Date },
@@ -16,6 +19,9 @@ const resultPublicationSchema = new Schema(
   { timestamps: true }
 );
 
-resultPublicationSchema.index({ categoryId: 1, competitionLevel: 1 }, { unique: true });
+resultPublicationSchema.index(
+  { categoryId: 1, competitionLevel: 1, region: 1, county: 1, subCounty: 1 },
+  { unique: true }
+);
 
 export const ResultPublicationModel = model('ResultPublication', resultPublicationSchema);

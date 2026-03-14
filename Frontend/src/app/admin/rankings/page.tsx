@@ -25,6 +25,15 @@ const emptySettings: BackendSystemSettings = {
   competitionSchedule: [],
 };
 
+const getGroupKey = (group: {
+  categoryId: string;
+  competitionLevel: string;
+  scopeKey?: string;
+  areaLabel?: string;
+}) =>
+  group.scopeKey ||
+  `${group.categoryId}-${group.competitionLevel}-${group.areaLabel || 'default'}`;
+
 export default function AdminRankingsPage() {
   const { loading: authLoading } = useRequireAuth();
   const [groups, setGroups] = useState<BackendAdminRankingGroup[]>([]);
@@ -93,7 +102,7 @@ export default function AdminRankingsPage() {
     group: BackendAdminRankingGroup,
     force = false
   ) => {
-    const key = `${group.categoryId}-${group.competitionLevel}-${force ? 'force' : 'publish'}`;
+    const key = `${getGroupKey(group)}-${force ? 'force' : 'publish'}`;
     setSubmittingKey(key);
     setError(null);
     setSuccess(null);
@@ -107,12 +116,15 @@ export default function AdminRankingsPage() {
           | 'regional'
           | 'national',
         force,
+        region: group.region,
+        county: group.county,
+        subCounty: group.subCounty,
       });
 
       setSuccess(
         `${group.categoryName} rankings published for ${formatCompetitionLevel(
           String(group.competitionLevel)
-        )}.`
+        )}${group.areaLabel ? ` (${group.areaLabel})` : ''}.`
       );
       await loadPageData();
     } catch (err: unknown) {
@@ -123,7 +135,7 @@ export default function AdminRankingsPage() {
   };
 
   const handleHide = async (group: BackendAdminRankingGroup) => {
-    const key = `${group.categoryId}-${group.competitionLevel}-hide`;
+    const key = `${getGroupKey(group)}-hide`;
     setSubmittingKey(key);
     setError(null);
     setSuccess(null);
@@ -136,12 +148,15 @@ export default function AdminRankingsPage() {
           | 'county'
           | 'regional'
           | 'national',
+        region: group.region,
+        county: group.county,
+        subCounty: group.subCounty,
       });
 
       setSuccess(
         `${group.categoryName} rankings hidden for ${formatCompetitionLevel(
           String(group.competitionLevel)
-        )}.`
+        )}${group.areaLabel ? ` (${group.areaLabel})` : ''}.`
       );
       await loadPageData();
     } catch (err: unknown) {
@@ -165,7 +180,7 @@ export default function AdminRankingsPage() {
 
         <div className="grid gap-4 lg:grid-cols-[1fr,1fr,1fr,1fr]">
           <div className="surface p-5">
-            <p className="text-sm text-slate-300">Filtered Categories</p>
+            <p className="text-sm text-slate-300">Filtered Result Groups</p>
             <p className="mt-2 text-3xl font-semibold text-white">{summary.total}</p>
           </div>
           <div className="surface p-5">
@@ -236,13 +251,14 @@ export default function AdminRankingsPage() {
         ) : (
           <div className="space-y-6">
             {filteredGroups.map((group) => {
-              const publishKey = `${group.categoryId}-${group.competitionLevel}-publish`;
-              const overrideKey = `${group.categoryId}-${group.competitionLevel}-force`;
-              const hideKey = `${group.categoryId}-${group.competitionLevel}-hide`;
+              const groupKey = getGroupKey(group);
+              const publishKey = `${groupKey}-publish`;
+              const overrideKey = `${groupKey}-force`;
+              const hideKey = `${groupKey}-hide`;
 
               return (
                 <div
-                  key={`${group.categoryId}-${group.competitionLevel}`}
+                  key={groupKey}
                   className="surface overflow-hidden"
                 >
                   <div className="border-b border-white/10 px-5 py-5">
@@ -253,6 +269,7 @@ export default function AdminRankingsPage() {
                         </h2>
                         <p className="mt-1 text-sm text-slate-400">
                           {formatCompetitionLevel(String(group.competitionLevel))}
+                          {group.areaLabel ? ` • ${group.areaLabel}` : ''}
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2">

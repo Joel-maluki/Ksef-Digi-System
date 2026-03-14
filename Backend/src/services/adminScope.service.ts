@@ -16,6 +16,8 @@ export type AdminCompetitionLevel =
   | 'national'
   | 'global';
 
+export type CompetitionAreaLevel = Exclude<AdminCompetitionLevel, 'global'>;
+
 export type AdminScopeContext = {
   competitionLevel: AdminCompetitionLevel;
   region?: string;
@@ -23,6 +25,21 @@ export type AdminScopeContext = {
   subCounty?: string;
   active: boolean;
   isGlobal: boolean;
+};
+
+export type CompetitionAreaScope = {
+  competitionLevel: CompetitionAreaLevel;
+  region?: string;
+  county?: string;
+  subCounty?: string;
+};
+
+type ScopeLike = {
+  competitionLevel?: AdminCompetitionLevel;
+  region?: string;
+  county?: string;
+  subCounty?: string;
+  isGlobal?: boolean;
 };
 
 const GLOBAL_ADMIN_SCOPE: AdminScopeContext = {
@@ -49,12 +66,91 @@ const normalizeCompetitionLevel = (value: unknown): AdminCompetitionLevel => {
   return normalized;
 };
 
+export const isCompetitionAreaLevel = (
+  value: unknown
+): value is CompetitionAreaLevel => {
+  const normalized = String(value || '').trim().toLowerCase();
+
+  return (
+    normalized === 'sub_county' ||
+    normalized === 'county' ||
+    normalized === 'regional' ||
+    normalized === 'national'
+  );
+};
+
+const normalizeCompetitionAreaLevel = (
+  value: unknown
+): CompetitionAreaLevel => {
+  const normalized = normalizeCompetitionLevel(value);
+
+  if (normalized === 'global') {
+    throw new ApiError(400, 'Global is not a valid competition scope');
+  }
+
+  return normalized;
+};
+
 const findRegionByName = (value: unknown) => {
   const normalized = normalizeText(value).toLowerCase();
 
   return getKenyaAdministrativeUnits().regions.find(
     (region) => region.name.trim().toLowerCase() === normalized
   );
+};
+
+export const resolveCompetitionScopeInput = (payload: {
+  competitionLevel?: unknown;
+  region?: unknown;
+  county?: unknown;
+  subCounty?: unknown;
+}): CompetitionAreaScope => {
+  const competitionLevel = normalizeCompetitionAreaLevel(payload.competitionLevel);
+
+  if (competitionLevel === 'national') {
+    return {
+      competitionLevel,
+    };
+  }
+
+  if (competitionLevel === 'regional') {
+    const region = findRegionByName(payload.region);
+
+    if (!region) {
+      throw new ApiError(400, 'Region must be one of the configured Kenya regions');
+    }
+
+    return {
+      competitionLevel,
+      region: region.name,
+    };
+  }
+
+  if (competitionLevel === 'county') {
+    const county = findKenyaCountyByName(payload.county);
+
+    if (!county) {
+      throw new ApiError(400, 'County must be one of Kenya\'s 47 counties');
+    }
+
+    return {
+      competitionLevel,
+      region: county.region,
+      county: county.name,
+    };
+  }
+
+  const location = validateKenyaSchoolLocation({
+    county: payload.county,
+    subCounty: payload.subCounty,
+  });
+
+  return {
+    competitionLevel,
+    region: location.region,
+    county: location.county,
+    subCounty: location.subCounty,
+  };
 };
 
 export const resolveAdminAssignmentInput = (payload: {
@@ -72,52 +168,10 @@ export const resolveAdminAssignmentInput = (payload: {
     };
   }
 
-  if (competitionLevel === 'national') {
-    return {
-      competitionLevel,
-      active: true,
-    };
-  }
-
-  if (competitionLevel === 'regional') {
-    const region = findRegionByName(payload.region);
-
-    if (!region) {
-      throw new ApiError(400, 'Region must be one of the configured Kenya regions');
-    }
-
-    return {
-      competitionLevel,
-      region: region.name,
-      active: true,
-    };
-  }
-
-  if (competitionLevel === 'county') {
-    const county = findKenyaCountyByName(payload.county);
-
-    if (!county) {
-      throw new ApiError(400, 'County must be one of Kenya\'s 47 counties');
-    }
-
-    return {
-      competitionLevel,
-      region: county.region,
-      county: county.name,
-      active: true,
-    };
-  }
-
-  const location = validateKenyaSchoolLocation({
-    county: payload.county,
-    subCounty: payload.subCounty,
-  });
+  const scope = resolveCompetitionScopeInput(payload);
 
   return {
-    competitionLevel,
-    region: location.region,
-    county: location.county,
-    subCounty: location.subCounty,
+    ...scope,
     active: true,
   };
 };
@@ -174,7 +228,117 @@ export const upsertAdminAssignment = async (
   );
 };
 
-export const buildSchoolScopeFilter = (scope?: AdminScopeContext) => {
+export const buildCompetitionScopeFromSchoolLocation = (
+  location: {
+    region?: unknown;
+    county?: unknown;
+    subCounty?: unknown;
+  },
+  competitionLevel: CompetitionAreaLevel
+): CompetitionAreaScope => {
+  const region = normalizeText(location.region) || undefined;
+  const county = normalizeText(location.county) || undefined;
+  const subCounty = normalizeText(location.subCounty) || undefined;
+
+  if (competitionLevel === 'national') {
+    return { competitionLevel };
+  }
+
+  if (competitionLevel === 'regional') {
+    return {
+      competitionLevel,
+      region,
+    };
+  }
+
+  if (competitionLevel === 'county') {
+    return {
+      competitionLevel,
+      region,
+      county,
+    };
+  }
+
+  return {
+    competitionLevel,
+    region,
+    county,
+    subCounty,
+  };
+};
+
+export const buildCompetitionScopeKey = (
+  scope: Pick<CompetitionAreaScope, 'competitionLevel' | 'region' | 'county' | 'subCounty'>
+) =>
+  [
+    scope.competitionLevel,
+    scope.region || '-',
+    scope.county || '-',
+    scope.subCounty || '-',
+  ].join('|');
+
+export const formatCompetitionScopeLabel = (
+  scope: Pick<CompetitionAreaScope, 'competitionLevel' | 'region' | 'county' | 'subCounty'>
+) => {
+  if (scope.competitionLevel === 'national') {
+    return 'Kenya';
+  }
+
+  if (scope.competitionLevel === 'regional') {
+    return scope.region || 'Regional';
+  }
+
+  if (scope.competitionLevel === 'county') {
+    return scope.county || scope.region || 'County';
+  }
+
+  return [scope.subCounty, scope.county].filter(Boolean).join(', ') || 'Sub-County';
+};
+
+export const buildPublicationScopeFilter = (
+  scope: Pick<ScopeLike, 'competitionLevel' | 'region' | 'county' | 'subCounty'>
+) => {
+  if (!scope.competitionLevel || scope.competitionLevel === 'global' || scope.competitionLevel === 'national') {
+    return {};
+  }
+
+  if (scope.competitionLevel === 'regional') {
+    return scope.region ? { region: scope.region } : {};
+  }
+
+  if (scope.competitionLevel === 'county') {
+    return {
+      ...(scope.region ? { region: scope.region } : {}),
+      ...(scope.county ? { county: scope.county } : {}),
+    };
+  }
+
+  return {
+    ...(scope.region ? { region: scope.region } : {}),
+    ...(scope.county ? { county: scope.county } : {}),
+    ...(scope.subCounty ? { subCounty: scope.subCounty } : {}),
+  };
+};
+
+export const buildCompetitionScopeFromPublication = (publication: {
+  competitionLevel: unknown;
+  region?: unknown;
+  county?: unknown;
+  subCounty?: unknown;
+}): CompetitionAreaScope => {
+  const competitionLevel = normalizeCompetitionAreaLevel(publication.competitionLevel);
+
+  return buildCompetitionScopeFromSchoolLocation(
+    {
+      region: publication.region,
+      county: publication.county,
+      subCounty: publication.subCounty,
+    },
+    competitionLevel
+  );
+};
+
+export const buildSchoolScopeFilter = (scope?: ScopeLike) => {
   if (!scope || scope.isGlobal || scope.competitionLevel === 'national') {
     return {};
   }
@@ -193,7 +357,7 @@ export const buildSchoolScopeFilter = (scope?: AdminScopeContext) => {
   };
 };
 
-export const getScopedSchoolIds = async (scope?: AdminScopeContext) => {
+export const getScopedSchoolIds = async (scope?: ScopeLike) => {
   const schoolFilter = buildSchoolScopeFilter(scope);
 
   if (Object.keys(schoolFilter).length === 0) {
@@ -205,7 +369,7 @@ export const getScopedSchoolIds = async (scope?: AdminScopeContext) => {
 };
 
 export const buildScopedProjectFilter = async (
-  scope?: AdminScopeContext,
+  scope?: ScopeLike,
   baseFilter: Record<string, unknown> = {}
 ) => {
   if (!scope || scope.isGlobal) {

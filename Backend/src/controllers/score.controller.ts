@@ -12,6 +12,7 @@ import {
 import { ok } from '../utils/apiResponse';
 import { ApiError } from '../utils/ApiError';
 import { calculateCategoryRanking } from '../services/ranking.service';
+import { buildCompetitionScopeFromSchoolLocation } from '../services/adminScope.service';
 import { hasSchoolConflict } from '../services/judgingRules.service';
 import { getSystemSettings } from '../services/systemSettings.service';
 
@@ -110,7 +111,19 @@ export const getScoresByProject = async (req: Request, res: Response) => {
   const scores = await ScoreModel.find({ projectId: req.params.projectId }).populate('judgeId', 'fullName email');
   const project = await ProjectModel.findById(req.params.projectId);
   if (!project) throw new ApiError(404, 'Project not found');
-  const ranking = await calculateCategoryRanking(String(project.categoryId), project.currentLevel);
+  const school = await SchoolModel.findById(project.schoolId)
+    .select('region county subCounty')
+    .lean();
+  const ranking = await calculateCategoryRanking(String(project.categoryId), {
+    ...buildCompetitionScopeFromSchoolLocation(
+      {
+        region: school?.region,
+        county: school?.county,
+        subCounty: school?.subCounty,
+      },
+      project.currentLevel as Parameters<typeof buildCompetitionScopeFromSchoolLocation>[1]
+    ),
+  });
   const summary = ranking.find((r) => r.projectId === req.params.projectId);
   res.json(ok({ scores, summary }));
 };

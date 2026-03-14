@@ -4,7 +4,7 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { updateMyPassword } from '@/lib/api';
 import { useRequireAuth } from '@/lib/useRequireAuth';
 
@@ -81,8 +81,7 @@ export default function SetPasswordPage() {
           <form className="surface space-y-5 p-6" onSubmit={handleSubmit}>
             <div>
               <label className="mb-2 block text-sm text-slate-300">Current Password</label>
-              <Input
-                type="password"
+              <PasswordInput
                 value={currentPassword}
                 onChange={(event) => setCurrentPassword(event.target.value)}
                 className="border-white/10 bg-white/5 text-white"
@@ -91,8 +90,7 @@ export default function SetPasswordPage() {
 
             <div>
               <label className="mb-2 block text-sm text-slate-300">New Password</label>
-              <Input
-                type="password"
+              <PasswordInput
                 value={newPassword}
                 onChange={(event) => setNewPassword(event.target.value)}
                 className="border-white/10 bg-white/5 text-white"
@@ -101,8 +99,7 @@ export default function SetPasswordPage() {
 
             <div>
               <label className="mb-2 block text-sm text-slate-300">Confirm New Password</label>
-              <Input
-                type="password"
+              <PasswordInput
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 className="border-white/10 bg-white/5 text-white"

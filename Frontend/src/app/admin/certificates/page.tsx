@@ -40,6 +40,7 @@ export default function AdminCertificatesPage() {
           .map((item) => ({
             categoryName: group.categoryName,
             competitionLevel: group.competitionLevel,
+            areaLabel: group.areaLabel || '',
             projectCode: item.projectCode,
             projectTitle: item.title,
             schoolName: item.schoolName,
@@ -97,6 +98,7 @@ export default function AdminCertificatesPage() {
                       <p className="font-semibold text-white">{row.categoryName}</p>
                       <p className="mt-1 text-sm text-slate-300">
                         {formatCompetitionLevel(String(row.competitionLevel))}
+                        {row.areaLabel ? ` • ${row.areaLabel}` : ''}
                       </p>
                     </div>
                     <div className="rounded-xl bg-blue-500/15 px-3 py-2 text-sm font-semibold text-blue-100">
@@ -117,7 +119,7 @@ export default function AdminCertificatesPage() {
                 <thead className="bg-white/5 text-left text-slate-300">
                   <tr>
                     <th className="px-4 py-3">Category</th>
-                    <th className="px-4 py-3">Level</th>
+                    <th className="px-4 py-3">Level / Area</th>
                     <th className="px-4 py-3">Project</th>
                     <th className="px-4 py-3">School</th>
                     <th className="px-4 py-3">Rank</th>
@@ -133,6 +135,7 @@ export default function AdminCertificatesPage() {
                       <td className="px-4 py-3 text-white">{row.categoryName}</td>
                       <td className="px-4 py-3 text-slate-300">
                         {formatCompetitionLevel(String(row.competitionLevel))}
+                        {row.areaLabel ? ` • ${row.areaLabel}` : ''}
                       </td>
                       <td className="px-4 py-3 text-slate-300">
                         {row.projectCode} - {row.projectTitle}

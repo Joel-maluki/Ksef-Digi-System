@@ -8,6 +8,7 @@ import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { login } from '@/lib/api';
 
 const roleTargets = {
@@ -146,10 +147,9 @@ export default function LoginPage() {
 
                 <div>
                   <label className="mb-2 block text-sm text-slate-300">Password</label>
-                  <Input
+                  <PasswordInput
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    type="password"
                     placeholder="Enter your password"
                     className="border-white/10 bg-white/5 text-white"
                   />

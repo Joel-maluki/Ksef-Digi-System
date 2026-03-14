@@ -8,6 +8,7 @@ import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import {
   BackendKenyaAdministrativeUnits,
   getKenyaAdministrativeUnits,
@@ -335,8 +336,7 @@ export default function RegisterSchoolPage() {
                       <label className="mb-2 block text-sm text-slate-300">
                         Initial Access Password
                       </label>
-                      <Input
-                        type="password"
+                      <PasswordInput
                         value={form.password}
                         onChange={(event) =>
                           setForm((current) => ({ ...current, password: event.target.value }))
@@ -349,8 +349,7 @@ export default function RegisterSchoolPage() {
                       <label className="mb-2 block text-sm text-slate-300">
                         Confirm Initial Password
                       </label>
-                      <Input
-                        type="password"
+                      <PasswordInput
                         value={form.confirmPassword}
                         onChange={(event) =>
                           setForm((current) => ({

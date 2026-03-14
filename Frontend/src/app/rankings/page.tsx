@@ -22,9 +22,13 @@ const toRankingGroups = (
       Boolean(group?.categoryId && Array.isArray(group?.rankings))
   );
 
+const getGroupKey = (group: BackendPublicRankingGroup) =>
+  group.scopeKey ||
+  `${group.categoryId}-${group.competitionLevel}-${group.areaLabel || 'default'}`;
+
 export default function RankingsPage() {
   const [rankingGroups, setRankingGroups] = useState<BackendPublicRankingGroup[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedGroupKey, setSelectedGroupKey] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -76,42 +80,39 @@ export default function RankingsPage() {
     [rankingGroups, selectedLevel]
   );
 
-  const availableCategories = useMemo(() => {
-    const categoryMap = new Map<string, { id: string; name: string }>();
-
-    groupsForLevel.forEach((group) => {
-      if (!categoryMap.has(group.categoryId)) {
-        categoryMap.set(group.categoryId, {
-          id: group.categoryId,
-          name: group.categoryName,
-        });
-      }
-    });
-
-    return Array.from(categoryMap.values());
-  }, [groupsForLevel]);
+  const availableGroups = useMemo(
+    () =>
+      groupsForLevel.map((group) => ({
+        id: getGroupKey(group),
+        categoryName: group.categoryName,
+        areaLabel: group.areaLabel,
+      })),
+    [groupsForLevel]
+  );
 
   useEffect(() => {
     if (groupsForLevel.length === 0) {
-      setSelectedCategory('');
+      setSelectedGroupKey('');
       setExpanded(null);
       return;
     }
 
-    const currentExists = groupsForLevel.some((group) => group.categoryId === selectedCategory);
+    const currentExists = groupsForLevel.some(
+      (group) => getGroupKey(group) === selectedGroupKey
+    );
 
     if (!currentExists) {
-      setSelectedCategory(groupsForLevel[0].categoryId);
+      setSelectedGroupKey(getGroupKey(groupsForLevel[0]));
       setExpanded(null);
     }
-  }, [groupsForLevel, selectedCategory]);
+  }, [groupsForLevel, selectedGroupKey]);
 
   const rankingGroup = useMemo(
     () =>
-      groupsForLevel.find((group) => group.categoryId === selectedCategory) ||
+      groupsForLevel.find((group) => getGroupKey(group) === selectedGroupKey) ||
       groupsForLevel[0] ||
       null,
-    [groupsForLevel, selectedCategory]
+    [groupsForLevel, selectedGroupKey]
   );
 
   const ranked = useMemo(() => {
@@ -181,20 +182,23 @@ export default function RankingsPage() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3 overflow-x-auto rounded-2xl border border-white/10 bg-white/5 p-2">
-              {availableCategories.map((category) => (
+              {availableGroups.map((group) => (
                 <button
-                  key={category.id}
+                  key={group.id}
                   onClick={() => {
-                    setSelectedCategory(category.id);
+                    setSelectedGroupKey(group.id);
                     setExpanded(null);
                   }}
                   className={`rounded-xl px-4 py-2 text-sm ${
-                    selectedCategory === category.id
+                    selectedGroupKey === group.id
                       ? 'bg-blue-600 text-white'
                       : 'text-slate-300'
                   }`}
                 >
-                  {category.name}
+                  <span>{group.categoryName}</span>
+                  {group.areaLabel ? (
+                    <span className="ml-2 text-xs text-slate-300">{group.areaLabel}</span>
+                  ) : null}
                 </button>
               ))}
             </div>
@@ -204,6 +208,12 @@ export default function RankingsPage() {
               <span className="font-medium text-white">
                 {formatCompetitionLevel(String(rankingGroup?.competitionLevel || selectedLevel))}
               </span>
+              {rankingGroup?.areaLabel ? (
+                <>
+                  {' '}
+                  in <span className="font-medium text-white">{rankingGroup.areaLabel}</span>
+                </>
+              ) : null}
               .
             </div>
 

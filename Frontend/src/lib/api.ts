@@ -211,6 +211,11 @@ export type BackendPublicRankingGroup = {
   categoryId: string;
   categoryName: string;
   competitionLevel: CompetitionLevelKey | string;
+  scopeKey?: string;
+  areaLabel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
   rankings: BackendRankedProject[];
 };
 
@@ -247,6 +252,11 @@ export type BackendPublicationOverview = {
   categoryName: string;
   categoryCode: string;
   competitionLevel: CompetitionLevelKey | string;
+  scopeKey?: string;
+  areaLabel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
   projectCount: number;
   scoredProjects: number;
   lockedScores: number;
@@ -287,6 +297,11 @@ export type BackendAdminRankingGroup = {
   categoryName: string;
   categoryCode: string;
   competitionLevel: CompetitionLevelKey | string;
+  scopeKey?: string;
+  areaLabel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
   projectCount: number;
   scoredProjects: number;
   minimumJudgeCount: number;
@@ -535,6 +550,9 @@ export type PublishResultsPayload = {
   categoryId: string;
   competitionLevel: CompetitionLevelKey;
   force?: boolean;
+  region?: string;
+  county?: string;
+  subCounty?: string;
 };
 
 const defaultHeaders: Record<string, string> = {
@@ -1251,10 +1269,16 @@ export async function getBackendHealth(): Promise<BackendHealth> {
 export async function getPublicRankings(filters?: {
   categoryId?: string;
   competitionLevel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
 }): Promise<BackendPublicRankingGroup[] | BackendPublicRankingGroup> {
   const query = toQuery({
     categoryId: filters?.categoryId,
     competitionLevel: filters?.competitionLevel,
+    region: filters?.region,
+    county: filters?.county,
+    subCounty: filters?.subCounty,
   });
 
   const res = await request<ApiResponse<BackendPublicRankingGroup[] | BackendPublicRankingGroup>>(

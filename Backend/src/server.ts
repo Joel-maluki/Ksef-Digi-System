@@ -1,10 +1,12 @@
 import app from './app';
 import { connectDb } from './config/db';
+import { ResultPublicationModel } from './models/ResultPublication';
 import { env } from './config/env';
 import { ensureDefaultCategories } from './services/categorySeed.service';
 
 const start = async () => {
   await connectDb();
+  await ResultPublicationModel.syncIndexes();
   await ensureDefaultCategories();
   app.listen(env.port, '0.0.0.0', () => {
     console.log(`KSEF backend listening on port ${env.port}`);

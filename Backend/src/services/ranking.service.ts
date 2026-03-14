@@ -3,6 +3,10 @@ import { CategoryModel } from '../models/Category';
 import { ProjectModel } from '../models/Project';
 import { SchoolModel } from '../models/School';
 import { ScoreModel } from '../models/Score';
+import {
+  buildSchoolScopeFilter,
+  type CompetitionAreaScope,
+} from './adminScope.service';
 import { MIN_JUDGES_PER_PROJECT } from './judgingRules.service';
 
 export type RankedProject = {
@@ -29,9 +33,61 @@ export type RankedProject = {
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-export const calculateCategoryRanking = async (categoryId: string, currentLevel?: string): Promise<RankedProject[]> => {
+type RankingScopeInput =
+  | string
+  | {
+      competitionLevel?: string;
+      region?: string;
+      county?: string;
+      subCounty?: string;
+    };
+
+const normalizeRankingScope = (
+  input?: RankingScopeInput
+): {
+  competitionLevel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
+} => {
+  if (!input) {
+    return {};
+  }
+
+  if (typeof input === 'string') {
+    return { competitionLevel: input };
+  }
+
+  return {
+    competitionLevel: input.competitionLevel,
+    region: input.region,
+    county: input.county,
+    subCounty: input.subCounty,
+  };
+};
+
+export const calculateCategoryRanking = async (
+  categoryId: string,
+  scopeInput?: RankingScopeInput
+): Promise<RankedProject[]> => {
+  const scope = normalizeRankingScope(scopeInput);
   const filter: any = { categoryId: new Types.ObjectId(categoryId) };
-  if (currentLevel) filter.currentLevel = currentLevel;
+  if (scope.competitionLevel) {
+    filter.currentLevel = scope.competitionLevel;
+  }
+
+  const schoolScopeFilter = buildSchoolScopeFilter({
+    competitionLevel:
+      scope.competitionLevel as CompetitionAreaScope['competitionLevel'] | undefined,
+    region: scope.region,
+    county: scope.county,
+    subCounty: scope.subCounty,
+  });
+
+  if (Object.keys(schoolScopeFilter).length > 0) {
+    const scopedSchools = await SchoolModel.find(schoolScopeFilter).select('_id').lean();
+    filter.schoolId = { $in: scopedSchools.map((school) => school._id) };
+  }
 
   const projects = await ProjectModel.find(filter).lean();
   const scores = await ScoreModel.find({
@@ -102,11 +158,12 @@ export const calculateCategoryRanking = async (categoryId: string, currentLevel?
   return ranked;
 };
 
-export const getPublishedRankings = async (currentLevel?: string) => {
+export const getPublishedRankings = async (scopeInput?: RankingScopeInput) => {
+  const scope = normalizeRankingScope(scopeInput);
   const categories = await CategoryModel.find({ active: true }).lean();
   const result = [] as Array<{ categoryId: string; categoryName: string; rankings: RankedProject[] }>;
   for (const category of categories) {
-    const rankings = await calculateCategoryRanking(String(category._id), currentLevel);
+    const rankings = await calculateCategoryRanking(String(category._id), scope);
     result.push({ categoryId: String(category._id), categoryName: category.name, rankings });
   }
   return result;

@@ -1,6 +1,11 @@
 import { CategoryModel } from '../models/Category';
 import { ProjectModel } from '../models/Project';
 import { ResultPublicationModel } from '../models/ResultPublication';
+import type { AdminScopeContext } from './adminScope.service';
+import {
+  buildPublicationScopeFilter,
+  buildScopedProjectFilter,
+} from './adminScope.service';
 import {
   CompetitionLevelKey,
   CompetitionScheduleEntry,
@@ -163,14 +168,28 @@ const buildLeaderboard = (
 export const getCompetitionMetrics = async ({
   competitionLevel,
   scheduleEntries = [],
+  scope,
 }: {
   competitionLevel: CompetitionLevelKey;
   scheduleEntries?: CompetitionScheduleEntry[];
+  scope?: AdminScopeContext;
 }): Promise<CompetitionMetricsReport> => {
+  const projectFilter =
+    scope && !scope.isGlobal
+      ? await buildScopedProjectFilter(scope, { currentLevel: competitionLevel })
+      : { currentLevel: competitionLevel };
+  const publicationFilter =
+    scope && !scope.isGlobal
+      ? {
+          competitionLevel,
+          published: true,
+          ...buildPublicationScopeFilter(scope),
+        }
+      : { competitionLevel, published: true };
   const [categories, levelProjects, publications] = await Promise.all([
     CategoryModel.find({ active: true }).sort({ name: 1 }).lean(),
-    ProjectModel.find({ currentLevel: competitionLevel }).select('categoryId').lean(),
-    ResultPublicationModel.find({ competitionLevel, published: true }).lean(),
+    ProjectModel.find(projectFilter).select('categoryId').lean(),
+    ResultPublicationModel.find(publicationFilter).lean(),
   ]);
 
   const categoryIdsWithProjects = Array.from(
@@ -181,7 +200,12 @@ export const getCompetitionMetrics = async ({
     categories
       .filter((category) => categoryIdsWithProjects.includes(String(category._id)))
       .map(async (category) => {
-        const rankings = await calculateCategoryRanking(String(category._id), competitionLevel);
+        const rankings = await calculateCategoryRanking(String(category._id), {
+          competitionLevel,
+          region: scope?.region,
+          county: scope?.county,
+          subCounty: scope?.subCounty,
+        });
         return {
           categoryId: String(category._id),
           rankings,
