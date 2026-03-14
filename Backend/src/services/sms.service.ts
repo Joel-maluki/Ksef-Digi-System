@@ -36,12 +36,13 @@ export const buildPasswordRecoverySms = ({
   temporaryPassword,
 }: {
   fullName: string;
-  role: 'judge' | 'patron';
+  role: 'admin' | 'judge' | 'patron';
   loginIdentifier: string;
   temporaryPassword: string;
 }) => {
   const loginUrl = `${env.frontendUrl.replace(/\/$/, '')}/login`;
-  const roleLabel = role === 'judge' ? 'Judge' : 'Patron';
+  const roleLabel =
+    role === 'admin' ? 'Admin' : role === 'judge' ? 'Judge' : 'Patron';
 
   return `KSEF ${roleLabel} password reset for ${fullName}. Login identifier: ${loginIdentifier}. Temporary password: ${temporaryPassword}. Login: ${loginUrl}. Change the password immediately after signing in.`;
 };

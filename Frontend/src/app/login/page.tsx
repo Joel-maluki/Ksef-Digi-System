@@ -153,16 +153,14 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     className="border-white/10 bg-white/5 text-white"
                   />
-                  {role !== 'admin' ? (
-                    <div className="mt-2 text-right">
-                      <Link
-                        href={`/forgot-password?role=${role}`}
-                        className="text-xs text-blue-200 hover:text-white"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                  ) : null}
+                  <div className="mt-2 text-right">
+                    <Link
+                      href={`/forgot-password?role=${role}`}
+                      className="text-xs text-blue-200 hover:text-white"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                 </div>
               </div>
 

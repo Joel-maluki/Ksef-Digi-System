@@ -626,7 +626,7 @@ export async function login(
 }
 
 export async function forgotPassword(data: {
-  role: 'judge' | 'patron';
+  role: 'admin' | 'judge' | 'patron';
   identifier: string;
   phone: string;
 }): Promise<{ success: boolean; message?: string }> {

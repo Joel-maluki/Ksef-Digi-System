@@ -40,8 +40,8 @@ const normalizePhoneForMatch = (value: unknown) => {
   return digits;
 };
 
-const generateTemporaryPassword = (role: 'judge' | 'patron') =>
-  `${role === 'judge' ? 'Judge' : 'Patron'}${randomBytes(4).toString('hex')}!`;
+const generateTemporaryPassword = (role: 'admin' | 'judge' | 'patron') =>
+  `${role === 'admin' ? 'Admin' : role === 'judge' ? 'Judge' : 'Patron'}${randomBytes(4).toString('hex')}!`;
 
 const validatePassword = (password: unknown, label = 'Password') => {
   const normalizedPassword = String(password || '');
@@ -108,7 +108,7 @@ const findUserByIdentifier = async (identifier: string) => {
 
 const findUserByIdentifierAndRole = async (
   identifier: string,
-  role: 'judge' | 'patron'
+  role: 'admin' | 'judge' | 'patron'
 ) => {
   const user = await findUserByIdentifier(identifier);
 
@@ -308,13 +308,16 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
-  const role = String(req.body?.role || '').trim().toLowerCase() as 'judge' | 'patron';
+  const role = String(req.body?.role || '').trim().toLowerCase() as
+    | 'admin'
+    | 'judge'
+    | 'patron';
   const identifier = String(req.body?.identifier || '').trim().toLowerCase();
   const phone = normalizePhoneForMatch(req.body?.phone);
   const genericMessage =
     'If the details matched an active account, a temporary password has been sent to the registered phone number.';
 
-  if (!['judge', 'patron'].includes(role) || !identifier || !phone) {
+  if (!['admin', 'judge', 'patron'].includes(role) || !identifier || !phone) {
     throw new ApiError(400, 'Role, login identifier, and phone number are required');
   }
 

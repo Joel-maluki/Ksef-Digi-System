@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout';
 import { Button } from '@/components/ui/button';
@@ -24,12 +24,6 @@ export default function SetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!authLoading && user && !user.mustChangePassword) {
-      router.replace(roleTargets[user.role] ?? '/');
-    }
-  }, [authLoading, router, user]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,15 +59,19 @@ export default function SetPasswordPage() {
 
   const layoutRole =
     user?.role === 'admin' || user?.role === 'judge' ? user.role : 'patron';
+  const isPasswordSetup = !!user?.mustChangePassword;
 
   return (
     <DashboardLayout role={layoutRole}>
       <div className="mx-auto max-w-xl space-y-6">
         <div>
-          <h1 className="section-title">Create Your Password</h1>
+          <h1 className="section-title">
+            {isPasswordSetup ? 'Create Your Password' : 'Change Your Password'}
+          </h1>
           <p className="section-copy mt-2">
-            Use this page after a first login or after signing in with a temporary reset
-            password. Set the final password before continuing into the system.
+            {isPasswordSetup
+              ? 'Use this page after a first login or after signing in with a temporary reset password. Set the final password before continuing into the system.'
+              : 'Use this page to change your current password while signed in.'}
           </p>
         </div>
 

@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout';
+import { Button } from '@/components/ui/button';
 import {
   BackendAdminDashboardStats,
   BackendCompetitionScheduleEntry,
@@ -265,12 +267,21 @@ export default function AdminSettingsPage() {
   return (
     <DashboardLayout role="admin">
       <div className="space-y-6">
-        <div>
-          <h1 className="section-title">Settings</h1>
-          <p className="section-copy mt-2">
-            Configure competition level, deadlines, ranking publication rules, and the
-            designated judging days for each KSEF stage.
-          </p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="section-title">Settings</h1>
+            <p className="section-copy mt-2">
+              Configure competition level, deadlines, ranking publication rules, and the
+              designated judging days for each KSEF stage.
+            </p>
+          </div>
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10"
+          >
+            <Link href="/set-password">Change My Password</Link>
+          </Button>
         </div>
 
         {authLoading || loading ? (

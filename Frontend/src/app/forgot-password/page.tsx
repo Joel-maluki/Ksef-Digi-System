@@ -10,12 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { forgotPassword } from '@/lib/api';
 
-const allowedRoles = ['judge', 'patron'] as const;
+const allowedRoles = ['admin', 'judge', 'patron'] as const;
 
 function ForgotPasswordPageContent() {
   const searchParams = useSearchParams();
   const initialRole = searchParams.get('role');
-  const [role, setRole] = useState<'judge' | 'patron'>('judge');
+  const [role, setRole] = useState<'admin' | 'judge' | 'patron'>('admin');
   const [identifier, setIdentifier] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,14 +23,16 @@ function ForgotPasswordPageContent() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialRole && allowedRoles.includes(initialRole as 'judge' | 'patron')) {
-      setRole(initialRole as 'judge' | 'patron');
+    if (initialRole && allowedRoles.includes(initialRole as 'admin' | 'judge' | 'patron')) {
+      setRole(initialRole as 'admin' | 'judge' | 'patron');
     }
   }, [initialRole]);
 
   const identifierLabel = useMemo(
     () =>
-      role === 'patron'
+      role === 'admin'
+        ? 'Admin Email or Username'
+        : role === 'patron'
         ? 'School Username or Patron Email'
         : 'Judge Email or Username',
     [role]
@@ -38,7 +40,9 @@ function ForgotPasswordPageContent() {
 
   const helperCopy = useMemo(
     () =>
-      role === 'patron'
+      role === 'admin'
+        ? 'Enter the admin email or username, plus the phone number stored on the admin account.'
+        : role === 'patron'
         ? 'Enter the school username or patron email, plus the phone number stored on the patron account.'
         : 'Enter the judge email or username, plus the phone number stored on the judge account.',
     [role]
@@ -79,15 +83,15 @@ function ForgotPasswordPageContent() {
             </div>
             <CardTitle className="text-3xl text-white">Forgot Password</CardTitle>
             <p className="text-sm text-slate-400">
-              Judges and patrons can request a temporary password by verifying the phone
-              number stored on the account.
+              Admins, judges, and patrons can request a temporary password by verifying
+              the phone number stored on the account.
             </p>
           </CardHeader>
           <CardContent>
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label className="mb-2 block text-sm text-slate-300">Account Type</label>
-                <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
+                <div className="grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
                   {allowedRoles.map((item) => (
                     <button
                       key={item}
