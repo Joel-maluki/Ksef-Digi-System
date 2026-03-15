@@ -219,6 +219,17 @@ export type BackendPublicRankingGroup = {
   rankings: BackendRankedProject[];
 };
 
+export type BackendPublicRankingGroupSummary = {
+  categoryId: string;
+  categoryName: string;
+  competitionLevel: CompetitionLevelKey | string;
+  scopeKey?: string;
+  areaLabel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
+};
+
 export type BackendAnnouncement = {
   _id: string;
   title: string;
@@ -1264,6 +1275,27 @@ export async function getPublicSummary(): Promise<BackendPublicSummary> {
 
 export async function getBackendHealth(): Promise<BackendHealth> {
   return request<BackendHealth>('/health');
+}
+
+export async function listPublicRankingGroups(filters?: {
+  categoryId?: string;
+  competitionLevel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
+}): Promise<BackendPublicRankingGroupSummary[]> {
+  const query = toQuery({
+    categoryId: filters?.categoryId,
+    competitionLevel: filters?.competitionLevel,
+    region: filters?.region,
+    county: filters?.county,
+    subCounty: filters?.subCounty,
+  });
+
+  const res = await request<ApiResponse<BackendPublicRankingGroupSummary[]>>(
+    `/api/public/ranking-groups${query}`
+  );
+  return res.data;
 }
 
 export async function getPublicRankings(filters?: {

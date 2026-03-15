@@ -4,7 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Medal, Search } from 'lucide-react';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Button } from '@/components/ui/button';
-import { BackendPublicRankingGroup, getPublicRankings } from '@/lib/api';
+import {
+  BackendPublicRankingGroup,
+  BackendPublicRankingGroupSummary,
+  getPublicRankings,
+  listPublicRankingGroups,
+} from '@/lib/api';
 import { competitionLevels, formatCompetitionLevel } from '@/lib/ksef';
 
 const levelSortOrder = {
@@ -22,27 +27,41 @@ const toRankingGroups = (
       Boolean(group?.categoryId && Array.isArray(group?.rankings))
   );
 
-const getGroupKey = (group: BackendPublicRankingGroup) =>
+const getGroupKey = (
+  group: BackendPublicRankingGroup | BackendPublicRankingGroupSummary
+) =>
   group.scopeKey ||
   `${group.categoryId}-${group.competitionLevel}-${group.areaLabel || 'default'}`;
 
+const buildRankingFilters = (group: BackendPublicRankingGroupSummary) => ({
+  categoryId: group.categoryId,
+  competitionLevel: String(group.competitionLevel),
+  region: group.region,
+  county: group.county,
+  subCounty: group.subCounty,
+});
+
 export default function RankingsPage() {
-  const [rankingGroups, setRankingGroups] = useState<BackendPublicRankingGroup[]>([]);
+  const [publishedGroups, setPublishedGroups] = useState<BackendPublicRankingGroupSummary[]>([]);
+  const [loadedRankingGroup, setLoadedRankingGroup] = useState<BackendPublicRankingGroup | null>(
+    null
+  );
   const [selectedGroupKey, setSelectedGroupKey] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [loadingRankings, setLoadingRankings] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadRankings = async () => {
-      setLoading(true);
+    const loadPublishedGroups = async () => {
+      setLoadingGroups(true);
       setError(null);
 
       try {
-        const result = await getPublicRankings();
-        const groups = toRankingGroups(result).sort((a, b) => {
+        const groups = listPublicRankingGroups();
+        const sortedGroups = (await groups).sort((a, b) => {
           const levelA =
             levelSortOrder[a.competitionLevel as keyof typeof levelSortOrder] ?? 999;
           const levelB =
@@ -51,33 +70,33 @@ export default function RankingsPage() {
           return levelA - levelB || a.categoryName.localeCompare(b.categoryName);
         });
 
-        setRankingGroups(groups);
-        setSelectedLevel((current) => current || String(groups[0]?.competitionLevel || ''));
+        setPublishedGroups(sortedGroups);
+        setSelectedLevel((current) => current || String(sortedGroups[0]?.competitionLevel || ''));
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : String(err));
-        setRankingGroups([]);
+        setPublishedGroups([]);
       } finally {
-        setLoading(false);
+        setLoadingGroups(false);
       }
     };
 
-    loadRankings();
+    loadPublishedGroups();
   }, []);
 
   const publishedLevels = useMemo(
     () =>
       competitionLevels.filter((level) =>
-        rankingGroups.some((group) => String(group.competitionLevel) === level.value)
+        publishedGroups.some((group) => String(group.competitionLevel) === level.value)
       ),
-    [rankingGroups]
+    [publishedGroups]
   );
 
   const groupsForLevel = useMemo(
     () =>
-      rankingGroups.filter(
+      publishedGroups.filter(
         (group) => !selectedLevel || String(group.competitionLevel) === selectedLevel
       ),
-    [rankingGroups, selectedLevel]
+    [publishedGroups, selectedLevel]
   );
 
   const availableGroups = useMemo(
@@ -107,16 +126,47 @@ export default function RankingsPage() {
     }
   }, [groupsForLevel, selectedGroupKey]);
 
-  const rankingGroup = useMemo(
-    () =>
-      groupsForLevel.find((group) => getGroupKey(group) === selectedGroupKey) ||
-      groupsForLevel[0] ||
-      null,
+  const selectedGroup = useMemo(
+    () => groupsForLevel.find((group) => getGroupKey(group) === selectedGroupKey) || null,
     [groupsForLevel, selectedGroupKey]
   );
 
+  useEffect(() => {
+    if (!selectedGroup) {
+      setLoadingRankings(false);
+      setLoadedRankingGroup(null);
+      return;
+    }
+
+    const loadSelectedGroup = async () => {
+      setLoadingRankings(true);
+      setError(null);
+
+      try {
+        const result = await getPublicRankings(buildRankingFilters(selectedGroup));
+        const groups = toRankingGroups(result);
+        setLoadedRankingGroup(groups[0] || null);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : String(err));
+        setLoadedRankingGroup(null);
+      } finally {
+        setLoadingRankings(false);
+      }
+    };
+
+    loadSelectedGroup();
+  }, [selectedGroup]);
+
+  const selectedRankingGroup = useMemo(
+    () =>
+      loadedRankingGroup && getGroupKey(loadedRankingGroup) === selectedGroupKey
+        ? loadedRankingGroup
+        : null,
+    [loadedRankingGroup, selectedGroupKey]
+  );
+
   const ranked = useMemo(() => {
-    const projects = rankingGroup?.rankings || [];
+    const projects = selectedRankingGroup?.rankings || [];
     const query = search.trim().toLowerCase();
 
     return projects.filter((item) => {
@@ -128,7 +178,7 @@ export default function RankingsPage() {
         item.schoolName.toLowerCase().includes(query)
       );
     });
-  }, [rankingGroup, search]);
+  }, [selectedRankingGroup, search]);
 
   return (
     <div className="page-shell">
@@ -142,13 +192,13 @@ export default function RankingsPage() {
           </p>
         </div>
 
-        {loading ? (
+        {loadingGroups || loadingRankings ? (
           <div className="surface mt-8 p-8 text-center text-slate-300">
             Loading published rankings...
           </div>
         ) : error ? (
           <div className="surface mt-8 p-8 text-center text-red-300">{error}</div>
-        ) : rankingGroups.length === 0 ? (
+        ) : publishedGroups.length === 0 ? (
           <div className="surface mt-8 p-8 text-center text-slate-300">
             No public rankings have been published yet. Once admin publishes category
             results, they will appear here.
@@ -206,12 +256,17 @@ export default function RankingsPage() {
             <div className="mt-4 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm text-slate-200">
               Showing published results for{' '}
               <span className="font-medium text-white">
-                {formatCompetitionLevel(String(rankingGroup?.competitionLevel || selectedLevel))}
+                {formatCompetitionLevel(
+                  String(selectedRankingGroup?.competitionLevel || selectedLevel)
+                )}
               </span>
-              {rankingGroup?.areaLabel ? (
+              {selectedRankingGroup?.areaLabel ? (
                 <>
                   {' '}
-                  in <span className="font-medium text-white">{rankingGroup.areaLabel}</span>
+                  in{' '}
+                  <span className="font-medium text-white">
+                    {selectedRankingGroup.areaLabel}
+                  </span>
                 </>
               ) : null}
               .

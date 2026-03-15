@@ -24,7 +24,34 @@ const levelSortOrder = {
   national: 3,
 } as const;
 
-const buildPublicRankingGroup = async ({
+const sortPublicRankingGroups = <
+  T extends {
+    competitionLevel: string;
+    categoryName: string;
+    areaLabel?: string;
+  },
+>(
+  groups: T[]
+) =>
+  groups.sort((left, right) => {
+    const levelDifference =
+      (levelSortOrder[left.competitionLevel as keyof typeof levelSortOrder] ?? 999) -
+      (levelSortOrder[right.competitionLevel as keyof typeof levelSortOrder] ?? 999);
+
+    if (levelDifference !== 0) {
+      return levelDifference;
+    }
+
+    const categoryDifference = left.categoryName.localeCompare(right.categoryName);
+
+    if (categoryDifference !== 0) {
+      return categoryDifference;
+    }
+
+    return (left.areaLabel || '').localeCompare(right.areaLabel || '');
+  });
+
+const buildPublicRankingGroupDescriptor = ({
   categoryId,
   categoryName,
   competitionLevel,
@@ -55,8 +82,64 @@ const buildPublicRankingGroup = async ({
     subCounty: scope.subCounty,
     scopeKey: buildCompetitionScopeKey(scope),
     areaLabel: formatCompetitionScopeLabel(scope),
-    rankings: await calculateCategoryRanking(categoryId, scope),
   };
+};
+
+const listPublishedRankingGroupDescriptors = async ({
+  categoryId,
+  competitionLevel,
+  region,
+  county,
+  subCounty,
+}: {
+  categoryId?: string;
+  competitionLevel?: string;
+  region?: string;
+  county?: string;
+  subCounty?: string;
+}) => {
+  const publicationFilter: Record<string, unknown> = { published: true };
+
+  if (categoryId) {
+    publicationFilter.categoryId = categoryId;
+  }
+
+  if (competitionLevel) {
+    publicationFilter.competitionLevel = competitionLevel;
+    Object.assign(
+      publicationFilter,
+      buildPublicationScopeFilter({
+        competitionLevel: competitionLevel as CompetitionAreaLevel,
+        region,
+        county,
+        subCounty,
+      })
+    );
+  }
+
+  const [publications, categories] = await Promise.all([
+    ResultPublicationModel.find(publicationFilter).lean(),
+    CategoryModel.find(categoryId ? { _id: categoryId } : {}).lean(),
+  ]);
+
+  const categoryMap = new Map(
+    categories.map((category) => [String(category._id), category.name])
+  );
+
+  return sortPublicRankingGroups(
+    publications
+      .map((publication) =>
+        buildPublicRankingGroupDescriptor({
+          categoryId: String(publication.categoryId),
+          categoryName: categoryMap.get(String(publication.categoryId)) || '',
+          competitionLevel: publication.competitionLevel,
+          region: publication.region,
+          county: publication.county,
+          subCounty: publication.subCounty,
+        })
+      )
+      .filter((group) => Boolean(group.categoryName))
+  );
 };
 
 export const publicRankings = async (req: Request, res: Response) => {
@@ -76,77 +159,65 @@ export const publicRankings = async (req: Request, res: Response) => {
     throw new ApiError(400, 'Invalid competition level');
   }
 
-  const publicationFilter: Record<string, unknown> = { published: true };
+  const publishedGroups = await listPublishedRankingGroupDescriptors({
+    categoryId,
+    competitionLevel,
+    region,
+    county,
+    subCounty,
+  });
 
-  if (categoryId) {
-    publicationFilter.categoryId = categoryId;
-  }
-
-  if (competitionLevel) {
-    publicationFilter.competitionLevel = competitionLevel;
-  }
-
-  if (competitionLevel) {
-    Object.assign(
-      publicationFilter,
-      buildPublicationScopeFilter({
-        competitionLevel: competitionLevel as CompetitionAreaLevel,
-        region,
-        county,
-        subCounty,
-      })
-    );
-  }
-
-  const [publications, categories] = await Promise.all([
-    ResultPublicationModel.find(publicationFilter).lean(),
-    CategoryModel.find(categoryId ? { _id: categoryId } : {}).lean(),
-  ]);
-
-  if (categoryId && publications.length === 0) {
+  if (categoryId && publishedGroups.length === 0) {
     return res.json(ok([]));
   }
 
-  const categoryMap = new Map(
-    categories.map((category) => [String(category._id), category.name])
-  );
-
   const data = await Promise.all(
-    publications.map((publication) =>
-      buildPublicRankingGroup({
-        categoryId: String(publication.categoryId),
-        categoryName: categoryMap.get(String(publication.categoryId)) || '',
-        competitionLevel: publication.competitionLevel,
-        region: publication.region,
-        county: publication.county,
-        subCounty: publication.subCounty,
+    publishedGroups.map(async (group) => ({
+      ...group,
+      rankings: await calculateCategoryRanking(group.categoryId, {
+        competitionLevel: group.competitionLevel,
+        region: group.region,
+        county: group.county,
+        subCounty: group.subCounty,
       })
-    )
+    }))
   );
 
-  const sortedData = data.sort((left, right) => {
-    const levelDifference =
-      (levelSortOrder[left.competitionLevel as keyof typeof levelSortOrder] ?? 999) -
-      (levelSortOrder[right.competitionLevel as keyof typeof levelSortOrder] ?? 999);
-
-    if (levelDifference !== 0) {
-      return levelDifference;
-    }
-
-    const categoryDifference = left.categoryName.localeCompare(right.categoryName);
-
-    if (categoryDifference !== 0) {
-      return categoryDifference;
-    }
-
-    return left.areaLabel.localeCompare(right.areaLabel);
-  });
+  const sortedData = sortPublicRankingGroups(data);
 
   if (categoryId) {
     return res.json(ok(sortedData.length === 1 ? sortedData[0] : sortedData));
   }
 
   res.json(ok(sortedData));
+};
+
+export const publicRankingGroups = async (req: Request, res: Response) => {
+  const { categoryId, region, county, subCounty } = req.query as {
+    categoryId?: string;
+    competitionLevel?: string;
+    region?: string;
+    county?: string;
+    subCounty?: string;
+  };
+  const competitionLevel =
+    typeof req.query.competitionLevel === 'string'
+      ? req.query.competitionLevel
+      : undefined;
+
+  if (competitionLevel && !isCompetitionAreaLevel(competitionLevel)) {
+    throw new ApiError(400, 'Invalid competition level');
+  }
+
+  const groups = await listPublishedRankingGroupDescriptors({
+    categoryId,
+    competitionLevel,
+    region,
+    county,
+    subCounty,
+  });
+
+  res.json(ok(groups));
 };
 
 export const publicScores = publicRankings;
@@ -171,18 +242,30 @@ export const publicCategoryResults = async (req: Request, res: Response) => {
   }).lean();
   const results = await Promise.all(
     publications.map((publication) =>
-      buildPublicRankingGroup({
-        categoryId: String(category._id),
-        categoryName: category.name,
-        competitionLevel: publication.competitionLevel,
-        region: publication.region,
-        county: publication.county,
-        subCounty: publication.subCounty,
-      })
+      (async () => {
+        const group = buildPublicRankingGroupDescriptor({
+          categoryId: String(category._id),
+          categoryName: category.name,
+          competitionLevel: publication.competitionLevel,
+          region: publication.region,
+          county: publication.county,
+          subCounty: publication.subCounty,
+        });
+
+        return {
+          ...group,
+          rankings: await calculateCategoryRanking(String(category._id), {
+            competitionLevel: group.competitionLevel,
+            region: group.region,
+            county: group.county,
+            subCounty: group.subCounty,
+          }),
+        };
+      })()
     )
   );
 
-  res.json(ok({ category, results }));
+  res.json(ok({ category, results: sortPublicRankingGroups(results) }));
 };
 
 export const publicSummary = async (_req: Request, res: Response) => {

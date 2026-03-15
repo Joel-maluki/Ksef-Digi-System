@@ -16,10 +16,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   BackendAnnouncement,
   BackendPublicRankingGroup,
+  BackendPublicRankingGroupSummary,
   BackendPublicSummary,
   getPublicRankings,
   getPublicSummary,
   listPublicAnnouncements,
+  listPublicRankingGroups,
 } from '@/lib/api';
 
 const emptySummary: BackendPublicSummary = {
@@ -34,55 +36,93 @@ const heroDelay = (delay: number) =>
     '--hero-delay': `${delay}ms`,
   }) as CSSProperties;
 
+const featuredLevelPriority = {
+  national: 3,
+  regional: 2,
+  county: 1,
+  sub_county: 0,
+} as const;
+
+const pickFeaturedRankingGroup = (groups: BackendPublicRankingGroupSummary[]) =>
+  [...groups].sort((left, right) => {
+    const leftPriority =
+      featuredLevelPriority[left.competitionLevel as keyof typeof featuredLevelPriority] ?? -1;
+    const rightPriority =
+      featuredLevelPriority[right.competitionLevel as keyof typeof featuredLevelPriority] ?? -1;
+
+    return (
+      rightPriority - leftPriority ||
+      left.categoryName.localeCompare(right.categoryName) ||
+      (left.areaLabel || '').localeCompare(right.areaLabel || '')
+    );
+  })[0] || null;
+
 export default function HomePage() {
   const [summary, setSummary] = useState<BackendPublicSummary>(emptySummary);
-  const [rankingGroups, setRankingGroups] = useState<BackendPublicRankingGroup[]>([]);
+  const [featuredRankingGroup, setFeaturedRankingGroup] =
+    useState<BackendPublicRankingGroup | null>(null);
   const [announcements, setAnnouncements] = useState<BackendAnnouncement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [rankingError, setRankingError] = useState<string | null>(null);
 
   useEffect(() => {
-    const load = async () => {
+    const loadPrimaryContent = async () => {
       setLoading(true);
-      setError(null);
+      const [summaryResult, announcementsResult] = await Promise.allSettled([
+        getPublicSummary(),
+        listPublicAnnouncements(),
+      ]);
 
+      if (summaryResult.status === 'fulfilled') {
+        setSummary(summaryResult.value);
+      }
+
+      if (announcementsResult.status === 'fulfilled') {
+        setAnnouncements(announcementsResult.value.slice(0, 3));
+      }
+
+      setLoading(false);
+    };
+
+    const loadFeaturedRanking = async () => {
+      setRankingError(null);
       try {
-        const [summaryData, rankingsData, announcementData] = await Promise.all([
-          getPublicSummary(),
-          getPublicRankings(),
-          listPublicAnnouncements(),
-        ]);
+        const groups = await listPublicRankingGroups();
+        const featuredGroup = pickFeaturedRankingGroup(groups);
 
-        setSummary(summaryData);
-        setRankingGroups(Array.isArray(rankingsData) ? rankingsData : [rankingsData]);
-        setAnnouncements(announcementData.slice(0, 3));
+        if (!featuredGroup) {
+          setFeaturedRankingGroup(null);
+          return;
+        }
+
+        const rankingsData = await getPublicRankings({
+          categoryId: featuredGroup.categoryId,
+          competitionLevel: String(featuredGroup.competitionLevel),
+          region: featuredGroup.region,
+          county: featuredGroup.county,
+          subCounty: featuredGroup.subCounty,
+        });
+        const selectedGroup = Array.isArray(rankingsData) ? rankingsData[0] : rankingsData;
+
+        setFeaturedRankingGroup(selectedGroup || null);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setLoading(false);
+        setRankingError(err instanceof Error ? err.message : String(err));
+        setFeaturedRankingGroup(null);
       }
     };
 
-    load();
+    loadPrimaryContent();
+    loadFeaturedRanking();
   }, []);
 
   const topRankedProjects = useMemo(
     () =>
-      rankingGroups
-        .flatMap((group) =>
-          group.rankings.map((project) => ({
-            ...project,
-            categoryName: group.categoryName,
-          }))
-        )
-        .sort(
-          (a, b) =>
-            b.finalScore - a.finalScore ||
-            a.rank - b.rank ||
-            a.projectCode.localeCompare(b.projectCode)
-        )
-        .slice(0, 4),
-    [rankingGroups]
+      (featuredRankingGroup?.rankings || []).slice(0, 4).map((project) => ({
+        ...project,
+        categoryName: featuredRankingGroup?.categoryName || '',
+        areaLabel: featuredRankingGroup?.areaLabel || '',
+      })),
+    [featuredRankingGroup]
   );
 
   const stats = [
@@ -296,9 +336,9 @@ export default function HomePage() {
                 <Link href="/rankings">Open rankings</Link>
               </Button>
             </div>
-            {error ? (
+            {rankingError ? (
               <div className="mt-6 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-200">
-                {error}
+                {rankingError}
               </div>
             ) : (
               <div className="mt-6 space-y-3">
@@ -317,7 +357,10 @@ export default function HomePage() {
                           #{item.rank} - {item.categoryName}
                         </p>
                         <h3 className="font-semibold text-white">{item.title}</h3>
-                        <p className="text-sm text-slate-400">{item.schoolName}</p>
+                        <p className="text-sm text-slate-400">
+                          {item.schoolName}
+                          {item.areaLabel ? ` - ${item.areaLabel}` : ''}
+                        </p>
                       </div>
                       <div className="rounded-xl bg-blue-500/15 px-3 py-2 text-sm font-semibold text-blue-100">
                         {item.finalScore.toFixed(1)} / 80

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   publicAnnouncements,
   publicCategoryResults,
+  publicRankingGroups,
   publicRankings,
   publicResults,
   publicScores,
@@ -11,6 +12,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 router.get('/summary', asyncHandler(publicSummary));
+router.get('/ranking-groups', asyncHandler(publicRankingGroups));
 router.get('/rankings', asyncHandler(publicRankings));
 router.get('/scores', asyncHandler(publicScores));
 router.get('/announcements', asyncHandler(publicAnnouncements));

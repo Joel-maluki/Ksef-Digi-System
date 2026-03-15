@@ -2,60 +2,111 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout';
-import { BackendPublicRankingGroup, getPublicRankings } from '@/lib/api';
+import {
+  BackendPublicRankingGroup,
+  BackendPublicRankingGroupSummary,
+  getPublicRankings,
+  listPublicRankingGroups,
+} from '@/lib/api';
 import { formatCompetitionLevel } from '@/lib/ksef';
 import { useRequireAuth } from '@/lib/useRequireAuth';
 
+const getGroupKey = (
+  group: BackendPublicRankingGroup | BackendPublicRankingGroupSummary
+) =>
+  group.scopeKey ||
+  `${group.categoryId}-${group.competitionLevel}-${group.areaLabel || 'default'}`;
+
+const buildRankingFilters = (group: BackendPublicRankingGroupSummary) => ({
+  categoryId: group.categoryId,
+  competitionLevel: String(group.competitionLevel),
+  region: group.region,
+  county: group.county,
+  subCounty: group.subCounty,
+});
+
 export default function AdminCertificatesPage() {
   const { loading: authLoading } = useRequireAuth();
-  const [rankingGroups, setRankingGroups] = useState<BackendPublicRankingGroup[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [publishedGroups, setPublishedGroups] = useState<BackendPublicRankingGroupSummary[]>([]);
+  const [selectedGroupKey, setSelectedGroupKey] = useState('');
+  const [rankingGroup, setRankingGroup] = useState<BackendPublicRankingGroup | null>(null);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [loadingRankings, setLoadingRankings] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
 
-    const load = async () => {
-      setLoading(true);
+    const loadPublishedGroups = async () => {
+      setLoadingGroups(true);
       setError(null);
 
       try {
-        const data = await getPublicRankings();
-        setRankingGroups(Array.isArray(data) ? data : [data]);
+        const groups = await listPublicRankingGroups();
+        setPublishedGroups(groups);
+        setSelectedGroupKey((current) => current || (groups[0] ? getGroupKey(groups[0]) : ''));
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : String(err));
+        setPublishedGroups([]);
       } finally {
-        setLoading(false);
+        setLoadingGroups(false);
       }
     };
 
-    load();
+    loadPublishedGroups();
   }, [authLoading]);
+
+  const selectedGroup = useMemo(
+    () => publishedGroups.find((group) => getGroupKey(group) === selectedGroupKey) || null,
+    [publishedGroups, selectedGroupKey]
+  );
+
+  useEffect(() => {
+    if (authLoading || !selectedGroup) {
+      setLoadingRankings(false);
+      setRankingGroup(null);
+      return;
+    }
+
+    const loadSelectedGroup = async () => {
+      setLoadingRankings(true);
+      setError(null);
+
+      try {
+        const data = await getPublicRankings(buildRankingFilters(selectedGroup));
+        const groups = Array.isArray(data) ? data : [data];
+        setRankingGroup(groups[0] || null);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : String(err));
+        setRankingGroup(null);
+      } finally {
+        setLoadingRankings(false);
+      }
+    };
+
+    loadSelectedGroup();
+  }, [authLoading, selectedGroup]);
 
   const certificateRows = useMemo(
     () =>
-      rankingGroups.flatMap((group) =>
-        group.rankings
-          .filter((item) => item.rank <= 4)
-          .map((item) => ({
-            categoryName: group.categoryName,
-            competitionLevel: group.competitionLevel,
-            areaLabel: group.areaLabel || '',
-            projectCode: item.projectCode,
-            projectTitle: item.title,
-            schoolName: item.schoolName,
-            rank: item.rank,
-            award:
-              item.rank === 1
-                ? 'Gold Certificate'
-                : item.rank === 2
-                  ? 'Silver Certificate'
-                  : item.rank === 3
-                    ? 'Bronze Certificate'
-                    : 'Qualification Certificate',
-          }))
-      ),
-    [rankingGroups]
+      (rankingGroup?.rankings || []).filter((item) => item.rank <= 4).map((item) => ({
+        categoryName: rankingGroup?.categoryName || '',
+        competitionLevel: rankingGroup?.competitionLevel || '',
+        areaLabel: rankingGroup?.areaLabel || '',
+        projectCode: item.projectCode,
+        projectTitle: item.title,
+        schoolName: item.schoolName,
+        rank: item.rank,
+        award:
+          item.rank === 1
+            ? 'Gold Certificate'
+            : item.rank === 2
+              ? 'Silver Certificate'
+              : item.rank === 3
+                ? 'Bronze Certificate'
+                : 'Qualification Certificate',
+      })),
+    [rankingGroup]
   );
 
   return (
@@ -65,7 +116,7 @@ export default function AdminCertificatesPage() {
           <div>
             <h1 className="section-title">Certificates</h1>
             <p className="section-copy mt-2">
-              Generate award and qualification certificate lists from published rankings.
+              Generate award and qualification certificate lists from one published result group at a time.
             </p>
           </div>
           <button
@@ -77,7 +128,25 @@ export default function AdminCertificatesPage() {
           </button>
         </div>
 
-        {authLoading || loading ? (
+        {publishedGroups.length > 0 ? (
+          <div className="surface p-4">
+            <label className="text-sm text-slate-300">Published result group</label>
+            <select
+              value={selectedGroupKey}
+              onChange={(event) => setSelectedGroupKey(event.target.value)}
+              className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white"
+            >
+              {publishedGroups.map((group) => (
+                <option key={getGroupKey(group)} value={getGroupKey(group)} className="bg-slate-900">
+                  {group.categoryName} - {formatCompetitionLevel(String(group.competitionLevel))}
+                  {group.areaLabel ? ` - ${group.areaLabel}` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+
+        {authLoading || loadingGroups || loadingRankings ? (
           <div className="surface p-6 text-slate-300">Loading certificate data...</div>
         ) : error ? (
           <div className="surface p-6 text-red-300">{error}</div>
